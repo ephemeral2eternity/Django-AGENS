@@ -47,11 +47,11 @@ def query(request):
 def add(request):
 	cur_host = get_local_name()
 	if request.method == "POST":
-		print request.POST
+		print(request.POST)
 		srvs = request.POST.keys()
 		for srv in srvs:
 			vidlist = request.POST.get(srv, "")
-			print vidlist
+			print(vidlist)
 			# for vid in vidlist:
 	elif request.method == "GET":
 		return HttpResponse("You should use POST method when calling http://cache_agent:port/video/add/ to add video lists!")
