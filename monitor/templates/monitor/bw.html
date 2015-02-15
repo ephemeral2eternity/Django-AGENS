@@ -1,0 +1,10 @@
+<h1>Show the 30 recent bw monitored on this agent!</h1>
+{% if bw_list %}
+    <ul>
+    {% for item in bw_list %}
+        <li>Time probed at: {{ item.time }} &nbsp;&nbsp;&nbsp; Per 5 minutes bw: {{ item.bw }} Mbps &nbsp;&nbsp;&nbsp; Total tx_bytes: {{ item.tx }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No bw has been monitored yet.</p>
+{% endif %}

@@ -1,0 +1,10 @@
+<h1>Show the 30 recent load monitored on this agent!</h1>
+{% if load_list %}
+    <ul>
+    {% for item in load_list %}
+        <li>Time probed at: {{ item.time }} &nbsp;&nbsp;&nbsp; Per 5 minutes load: {{ item.load }} &nbsp;&nbsp;&nbsp; Total load: {{ item.total }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No Load has been monitored yet.</p>
+{% endif %}

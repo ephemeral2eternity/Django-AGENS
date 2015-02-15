@@ -36,6 +36,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_cron',
+    'monitor',
+    'overlay',
+    'video',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,3 +85,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+#CRONJOBS = [
+#    ('* * * * *', 'agens.monitor.cron.load_job'),
+#]
+
+# CRONTAB_LOCK_JOBS = True
+CRON_CLASSES = [
+	"monitor.cron.load_job",
+	"overlay.cron.ping_job",
+	"video.cron.video_update_job",
+	# ...
+]

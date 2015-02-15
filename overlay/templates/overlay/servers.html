@@ -1,0 +1,15 @@
+<h1>Show all the cache servers and their rtts to the current agent!</h1>
+{% if curSrv %}
+<h2>The current server name is : {{ curSrv.name }}</h2>
+{% endif %}
+{% if srvs %}
+    <dl>
+    {% for srv in srvs %}
+        <dt>Cache Server Name: {{ srv.name }} </dt>
+	<dd>- The IP address of {{ srv.name }} is : {{ srv.ip}} </dd>
+	<dd>- The RTT from {{ curSrv.name }} to {{ srv.name }} is : {{ srv.rtt}} </dd>
+    {% endfor %}
+    </dl>
+{% else %}
+    <p>No servers has been initialized in the Server Model. Please run http://cache_agent:port/overlay/init/.</p>
+{% endif %}

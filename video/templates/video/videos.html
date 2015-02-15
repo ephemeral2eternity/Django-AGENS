@@ -1,0 +1,15 @@
+{% if host %}
+<h1>Show all the cached videos on agent {{ host }}</h1>
+{% endif %}
+{% if videos %}
+    <dl>
+    {% for vid in videos %}
+        <dt>Video ID: {{ vid.id }} </dt>
+	<dd>- The Real Video Name of Video {{ vid.id }} is : {{ vid.name }} </dd>
+	<dd>- The servers caching the Video {{ vid.id }} are : {{ vid.srvs }} </dd>
+	<dd>- The video is cached locally : {{ vid.isLocal }} </dd>
+    {% endfor %}
+    </dl>
+{% else %}
+    <p>No locally cached videos have been loaded. Please run http://cache_agent:port/video/init/ to initialize the list.</p>
+{% endif %}
