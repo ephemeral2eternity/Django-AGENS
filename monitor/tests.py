@@ -19,13 +19,13 @@ def update_overlay_obj(srv_ip, monitored_dict):
 
 # Test update_overlay_obj defined in cache_monitor.py
 srv = 'cache-09'
-load = 10
+bw = 2.0
 
-load_dict = {}
-load_dict['srv'] = srv
-load_dict['load'] = load
+bw_dict = {}
+bw_dict['srv'] = srv
+bw_dict['bw'] = bw
 
 ## send update to cache-08
 srv_ip = '130.211.63.102'
 
-update_overlay_obj(srv_ip, load_dict)
+update_overlay_obj(srv_ip, bw_dict)
