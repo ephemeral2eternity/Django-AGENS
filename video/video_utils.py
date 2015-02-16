@@ -60,6 +60,7 @@ def forward_updates(rcv_host, video_updates):
 		if rcv_host != peer.name:
 			print("Forward video updates to cache agent:", peer.name, " with ip:", peer.ip)
 			update_videos(peer.ip, video_updates)
+			print("Forward video updates successfully to", peer.name)
 
 # ================================================================================
 # Update the videos in caching_list to a peer
@@ -70,6 +71,7 @@ def update_videos(peer_ip, caching_list):
 	update_data = urllib.parse.urlencode(caching_list)
 	data = data.encode('utf-8')
 
+	print('Send a video/add request to ', peer_ip, '!')
 	req = urllib.request.Request(update_url, update_data)
 	req.add_header('agens-remote', local_host)
 	rsp = urllib.request.urlopen(req)
