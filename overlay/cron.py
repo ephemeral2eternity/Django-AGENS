@@ -8,7 +8,7 @@ class ping_job(CronJobBase):
 	"""
 
 	# Run every 1 hour
-	run_every = 60
+	run_every = 5
 	schedule = Schedule(run_every_mins=run_every)
 	code = 'overlay.cron.ping_job'
 

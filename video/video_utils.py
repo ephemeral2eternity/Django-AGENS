@@ -52,7 +52,7 @@ def update_videos(peer_ip, caching_list):
 	data = data.encode('utf-8')
 
 	req = urllib.request.Request(update_url, update_data)
-	rsp = urllib2.urlopen(req)
+	rsp = urllib.request.urlopen(req)
 	rspData = rsp.read()
 	print(rspData)
 
