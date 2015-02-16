@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'monitor',
     'overlay',
     'video',
+    'qoe',
 )
 
 MIDDLEWARE_CLASSES = (

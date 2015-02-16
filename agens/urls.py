@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^monitor/', include('monitor.urls')),
     url(r'^overlay/', include('overlay.urls')),
     url(r'^video/', include('video.urls')),
+    url(r'^qoe/', include('qoe.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
 )
