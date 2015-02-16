@@ -9,9 +9,9 @@
 	<td> Cache Server Name</td>
 	<td> IP Address</td>
 	<td> RTT to {{ curSrv.name }} </td>
-	<td> Recent QoE Evaluated </td>
-	<td> Recent Load Monitored </td>
-	<td> Recent BW Monitored </td>
+	<td> Recent QoE Evaluated (0-5) </td>
+	<td> Recent Load Monitored (# of requests per 5 minutes) </td>
+	<td> Recent BW Monitored (Mbps) </td>
     <tr>
     {% for srv in srvs %}
     <tr>
