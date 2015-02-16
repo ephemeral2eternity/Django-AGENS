@@ -58,7 +58,7 @@ def forward_updates(rcv_host, video_updates):
 	all_peers = Peer.objects.all()
 	for peer in all_peers:
 		if rcv_host != peer.name:
-			print("Forward video updates to cache agent:", peer.name)
+			print("Forward video updates to cache agent:", peer.name, " with ip:", peer.ip)
 			update_videos(peer.ip, video_updates)
 
 # ================================================================================

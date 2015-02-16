@@ -19,5 +19,7 @@ local_host = 'cache-07'
 local_vid_ids = [1, 2, 3, 4, 5, 6, 8, 9, 11]
 local_vid_ids_str = ', '.join(str(item) for item in local_vid_ids)
 caching_list[local_host] = local_vid_ids_str
+print(caching_list)
+
 
 update_videos(peer_ip, caching_list)
