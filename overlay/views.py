@@ -64,6 +64,6 @@ def peer(request):
 		new_peer = Peer(id=peer_id, name=peer_node, ip=peer_ip)
 		new_peer.save()
 		return HttpResponse("Successfully peering with agent " + get_host_name() + ".")
-	else request.method == "GET":
+	elif request.method == "GET":
 		print("The requested url is: ", request.get_full_path())
 		return HttpResponse("Please use POST method to peer with an agent when using http://cache_agent:port/overlay/peer/.")	
