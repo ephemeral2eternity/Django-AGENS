@@ -59,7 +59,7 @@ def connect_overlay():
 	to_connect = find_closest(other_srv_list)
 	while to_connect:
 		if peer_with(to_connect):
-			print("Successfull peer with agent: ", to_connect.name)
+			print("Successfull peer with agent: ", to_connect['name'])
 			return
 		else:
 			other_srv_list = remove_dict_from_list(to_connect, other_srv_list)
@@ -123,7 +123,7 @@ def peer_with(peer):
 		rsp = urllib.request.urlopen(req)
 		rsp_data = rsp.read()
 		print(rsp_data)
-		peer_name = peer.name
+		peer_name = peer['name']
 		peer_id = peer['id']
 		peer_ip = peer['ip']
 		new_peer = Peer(id=peer_id, name=peer_name, ip=peer_ip)
