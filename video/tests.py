@@ -8,6 +8,7 @@ def update_videos(peer_ip, caching_list):
         data = update_data.encode('utf-8')
 
         req = urllib.request.Request(url, data)
+	req.add_header('REMOTE_HOST', 'cache-07')
         rsp = urllib.request.urlopen(req)
         rspData = rsp.read()
         print(rspData)
