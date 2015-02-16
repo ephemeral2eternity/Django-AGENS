@@ -1,4 +1,5 @@
 import re
+import urllib
 from django.shortcuts import render
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -66,9 +67,11 @@ def query(request):
 def update(request):
 	url = request.get_full_path()
 	params = url.split('?')[1]
-	update_dict = url.parse.parse_qs(params)
+	print("Got url with params: ", params)
+	update_dict = urllib.parse.parse_qs(params)
 	if 'srv' in update_dict.keys():
 		srv = update_dict['srv'][0]
+		print("Parse update_dict with server, ", srv)
 		srv_obj = Server.objects.filter(name=srv)[0]
 		if 'bw' in update_dict.keys():
 			srv_obj.bw = float(update_dict['bw'][0])
