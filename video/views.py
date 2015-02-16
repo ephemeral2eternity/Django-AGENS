@@ -50,9 +50,22 @@ def add(request):
 		print(request.POST)
 		srvs = request.POST.keys()
 		for srv in srvs:
-			vidlist = request.POST.get(srv, "")
-			print(vidlist)
-			# for vid in vidlist:
+			vid_list_str = request.POST.get(srv, "")
+			vid_list = [int(s) for s in vid_list_str.split(',')]
+			print(vid_list)
+			for vid in vidlist:
+				vid_id = vid
+				vid_obj = Video.objects.get(id=vid_id)
+				if not vid_obj:
+					vid_obj.srvs = vid_obj.srvs + srv + ','
+				else:
+					vid_name = 'BBB'
+					isLocal = False
+					vid_srvs = srv + ','
+					new_vid = Video(id=vid_id, name=vid_name, isLocal=isLocal, srvs=vid_srvs)
+					new_vid.save()
+				print("Video " + vid + " on server " + srv + " has been updated!")
+		return HttpResponse("Successfully update video list cached on " + srv + "!")
 	elif request.method == "GET":
 		return HttpResponse("You should use POST method when calling http://cache_agent:port/video/add/ to add video lists!")
 				
