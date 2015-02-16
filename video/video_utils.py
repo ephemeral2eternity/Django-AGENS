@@ -55,12 +55,13 @@ def periodic_discover():
 #          video_updates --- updates made on local host
 # ================================================================================
 def forward_updates(rcv_host, video_updates):
-	all_peers = Peer.objects.all()
-	for peer in all_peers:
-		if rcv_host != peer.name:
-			print("Forward video updates to cache agent:", peer.name, " with ip:", peer.ip)
-			update_videos(peer.ip, video_updates)
-			print("Forward video updates successfully to", peer.name)
+	if len(video_updates) > 0:
+		all_peers = Peer.objects.all()
+		for peer in all_peers:
+			if rcv_host != peer.name:
+				#print("Forward video updates to cache agent:", peer.name, " with ip:", peer.ip)
+				update_videos(peer.ip, video_updates)
+				#print("Forward video updates successfully to", peer.name)
 
 # ================================================================================
 # Update the videos in caching_list to a peer
@@ -90,8 +91,9 @@ def update_list2str(update_list):
 	update_str = {}
 	for srv in update_list.keys():
 		vid_list = update_list[srv]
-		vid_list_str = ', '.join(str(vid) for vid in vid_list)
-		update_str[srv] = vid_list_str
+		if len(vid_list) > 0:
+			vid_list_str = ', '.join(str(vid) for vid in vid_list)
+			update_str[srv] = vid_list_str
 	return update_str
 
 #cached_videos = get_real_local_videos()
