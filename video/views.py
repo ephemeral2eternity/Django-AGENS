@@ -1,4 +1,5 @@
 import random
+from collections import defaultdict
 from django.shortcuts import render
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -50,6 +51,7 @@ def add(request):
 	print("The video/add request sent by", remote_host)
 	if request.method == "POST":
 		print(request.POST)
+		new_updates = defaultdict(list)
 		srvs = request.POST.keys()
 		for srv in srvs:
 			vid_list_str = request.POST.get(srv, "")
@@ -66,6 +68,7 @@ def add(request):
 					# print("Video server list in cache table:", vid_srv_list)
 					if srv not in vid_srv_list:
 						vid_obj.srvs = vid_obj.srvs + srv + ', '
+						new_updates[srv].append(vid)
 						# print("New srvs for video ", vid, " is ", vid_obj.srvs)
 						vid_obj.save()
 					# print("Server ", srv, " has been added to Video ", vid, " in cache table!")
@@ -76,7 +79,10 @@ def add(request):
 					# print("srvs for video ", vid, " is ", vid_srvs)
 					new_vid_obj = Video(id=vid_id, name=vid_name, isLocal=isLocal, srvs=vid_srvs)
 					new_vid_obj.save()
+					new_updates[srv].append(vid)
 					# print("Video ", vid, " on server ", srv," has been added to cache table!")
+		new_update_str = update_list2str(new_updates)
+		forward_updates(remote_host, new_update_str)
 		return HttpResponse("Successfully update video list cached on " + srv + "!")
 	elif request.method == "GET":
 		return HttpResponse("You should use POST method when calling http://cache_agent:port/video/add/ to add video lists!")
