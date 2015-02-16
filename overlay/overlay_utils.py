@@ -73,6 +73,7 @@ def object2list(srvs):
 	srv_list = []
 	for srv in srvs:
 		cur_srv = {}
+		cur_srv['id'] = srv.id
 		cur_srv['name'] = srv.name
 		cur_srv['ip'] = srv.ip
 		cur_srv['rtt'] = srv.rtt
@@ -99,8 +100,8 @@ def peer_with(peer):
 	url = 'http://%s:8615/overlay/peer/'%peer['ip']
 	cur_srv = Server.objects.filter(isLocal=True)[0]
 	peer_data = {}
-	peer_data['node'] = cur_srv['name']
-	peer_data['ip'] = cur_srv['ip']
+	peer_data['node'] = cur_srv.name
+	peer_data['ip'] = cur_srv.ip
 	encoded_peer_data = urllib.parse.urlencode(peer_data)
 	data = encoded_peer_data.encode('utf-8')
 
@@ -110,8 +111,8 @@ def peer_with(peer):
 		rsp_data = rsp.read()
 		print(rsp_data)
 		peer_name = peer.name
-		peer_id = peer.id
-		peer_ip = peer.ip
+		peer_id = peer['id']
+		peer_ip = peer['ip']
 		new_peer = Peer(id=peer_id, name=peer_name, ip=peer_ip)
 		new_peer.save()
 		return True
