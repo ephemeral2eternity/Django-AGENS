@@ -2,7 +2,8 @@
 import socket
 import os
 import ntpath
-import urllib2
+import urllib.request
+import urllib.parse
 from overlay.models import Peer
 from video.models import Video
 
@@ -47,11 +48,13 @@ def periodic_discover():
 
 def update_videos(peer_ip, caching_list):
 	update_url = 'http://%s:8615/video/add/'%peer_ip
-	update_data = urllib2.urlencode(caching_list)
-	header = {'User-Agent': 'AGENS Cache Agent'}
+	update_data = urllib.parse.urlencode(caching_list)
+	data = data.encode('utf-8')
 
-	req = urllib2.Request(update_url, update_data, header)
+	req = urllib.request.Request(update_url, update_data)
 	rsp = urllib2.urlopen(req)
+	rspData = rsp.read()
+	print(rspData)
 
 #cached_videos = get_real_local_videos()
 #print(cached_videos)
