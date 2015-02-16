@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
 from django.http import HttpResponse
 from overlay.models import Server, Peer
-from overlay.get_cache_agents import *
+from overlay.overlay_utils import *
 from overlay.ping import *
 
 # Create your views here.
