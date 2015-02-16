@@ -61,10 +61,22 @@ def connect_overlay():
 		if peer_with(to_connect):
 			print("Successfull peer with agent: ", to_connect.name)
 		else:
-			other_srv_list.pop(to_connect)
+			other_srv_list = remove_dict_from_list(to_connect, other_srv_list)
 			to_connect = find_closest(other_srv_list)
 	
 	print("There are no other cache agents running to peer with!")
+
+# ================================================================================
+# Remove a dict element from a dict list
+# @input : to_del --- the dict element to delete
+#          srv_list --- the server dict list
+# ================================================================================
+def remove_dict_from_list(to_del, srv_list):
+	for i in range(len(srv_list)):
+		if srv_list[i]['id'] == to_del['id']:
+			del srv_list[i]
+			break
+	return srv_list
 
 # ================================================================================
 # Convert the list of objects to a list of dict
