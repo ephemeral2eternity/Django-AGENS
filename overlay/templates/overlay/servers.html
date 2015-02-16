@@ -3,6 +3,7 @@
 <h2>The current server name is : {{ curSrv.name }}</h2>
 {% endif %}
 {% if srvs %}
+<h2>All available cache servers observed from the current server are:</h2>
     <dl>
     {% for srv in srvs %}
         <dt>Cache Server Name: {{ srv.name }} </dt>
@@ -12,4 +13,14 @@
     </dl>
 {% else %}
     <p>No servers has been initialized in the Server Model. Please run http://cache_agent:port/overlay/init/.</p>
+{% endif %}
+{% if peers %}
+<h2>All peer agents connected to the current server are:</h2>
+    <dl>
+    {% for peer in peers %}
+        <dt>Peer Agent Name: {{ peer.name }} </dt>
+    {% endfor %}
+    </dl>
+{% else %}
+    <p>The server has not been connected to the overlay. Please re-run http://cache_agent:port/overlay/init/ to connect!</p>
 {% endif %}

@@ -2,6 +2,7 @@ import json
 import socket
 import re
 import subprocess
+from overlay.models import Server, Peer
 
 def get_cache_agents():
         # List all instances
@@ -44,3 +45,49 @@ def get_cache_agent_ips():
 
 def get_host_name():
 	return str(socket.gethostname())
+
+def connect_overlay():
+	other_srvs = Server.objects.filter(isLocal=False)
+	other_srv_list = list(other_srvs)
+	# Find the closest node to peer with
+	to_connect = find_closest(other_srv_list)
+	if peer_with(to_connect):
+		print("Successfull peer with agent: ", to_connect.name)
+	else:
+		print("Failed to peer with agent: ", to_connect.name)
+		other_srv_list.pop(to_connect)
+		to_connect = find_closest(other_srv_list)
+		print("Retry to peer with agent: ", to_connect.name)
+		peer_with(to_connnect.ip)
+		
+
+def find_closest(srvs):
+	to_connect = srvs[0]
+	if srvs.count() > 1:
+		for srv in srvs:
+			if srv.rtt < to_connect.rtt:
+				to_connect = srv
+	return to_connect
+
+def peer_with(peer):
+	url = 'http://%s:8615/overlay/peer/'%peer.ip
+	cur_srv = Server.objects.filter(isLocal=True)
+	peer_data = {}
+	peer_data['node'] = cur_srv.name
+	peer_data['ip'] = cur_srv.ip
+	encoded_peer_data = urllib.parse.urlencode(peer_data)
+	data = encoded_peer_data.encode('utf-8')
+
+	try:
+		req = urllib.request.Request(url, data)
+		rsp = urllib.request.urlopen(req)
+		rsp_data = rsp.read()
+		print(rsp_data)
+		peer_name = peer.name
+		peer_id = peer.id
+		peer_ip = peer.ip
+		new_peer = Peer(id=peer_id, name=peer_name, ip=peer_ip)
+		new_peer.save()
+		return True
+	except:
+		return False

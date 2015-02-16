@@ -35,6 +35,12 @@ def initServer(request):
 		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt)
 		cur_srv.save()
 		print(srv_name, " is saved in the database!")
+
+	# Delete all objects in the table Peer
+	existing_peers = Peer.objects.all()
+	if existing_peers.count() > 0:
+		existing_peers.delete()
+	connect_overlay()
 	
 	return query(request)
 
@@ -42,12 +48,14 @@ def initServer(request):
 def query(request):
 	# Return the initialized servers
 	srv_list = Server.objects.all()
-	cur_srv = Server.objects.filter(isLocal='Yes')
+	cur_srv = Server.objects.filter(isLocal=True)
+	peer_list = Peer.objects.all()
 	# print("The current host is:", cur_srv[0].name)
 	templates = loader.get_template('overlay/servers.html')
 	context = RequestContext(request, {
 					'curSrv' : cur_srv[0],
 					'srvs' : srv_list,
+					'peers' : peer_list,
 	})
 	return HttpResponse(templates.render(context))
 
