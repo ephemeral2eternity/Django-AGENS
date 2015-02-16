@@ -48,34 +48,59 @@ def get_cache_agent_ips():
 def get_host_name():
 	return str(socket.gethostname())
 
+# ================================================================================
+# Add the closest available agent as the peer agent
+# ================================================================================
 def connect_overlay():
 	other_srvs = Server.objects.filter(isLocal=False)
+	other_srv_list = object2list(other_srvs)
 	# Find the closest node to peer with
-	to_connect = find_closest(other_srvs)
-	if peer_with(to_connect):
-		print("Successfull peer with agent: ", to_connect.name)
-	else:
-		print("Failed to peer with agent: ", to_connect.name)
-		#other_srv_list.pop(to_connect)
-		#to_connect = find_closest(other_srv_list)
-		#print("Retry to peer with agent: ", to_connect.name)
-		#peer_with(to_connnect.ip)
-		
+	
+	to_connect = find_closest(other_srv_list)
+	while to_connect:
+		if peer_with(to_connect):
+			print("Successfull peer with agent: ", to_connect.name)
+		else:
+			other_srv_list.pop(to_connect)
+			to_connect = find_closest(other_srv_list)
+	
+	print("There are no other cache agents running to peer with!")
 
+# ================================================================================
+# Convert the list of objects to a list of dict
+# ================================================================================
+def object2list(srvs):
+	srv_list = []
+	for srv in srvs:
+		cur_srv = {}
+		cur_srv['name'] = srv.name
+		cur_srv['ip'] = srv.ip
+		cur_srv['rtt'] = srv.rtt
+		srv_list.append(cur_srv)
+	return srv_list
+
+# ================================================================================
+# Find the closest server to peer with
+# ================================================================================
 def find_closest(srvs):
-	to_connect = srvs[0]
+	to_connect = None
+	if len(srvs) > 0:
+		to_connect = srvs[0]
 	if len(srvs) > 1:
 		for srv in srvs:
-			if srv.rtt < to_connect.rtt:
+			if srv['rtt'] < to_connect['rtt']:
 				to_connect = srv
 	return to_connect
 
+# ================================================================================
+# Peer with a peer node
+# ================================================================================
 def peer_with(peer):
-	url = 'http://%s:8615/overlay/peer/'%peer.ip
+	url = 'http://%s:8615/overlay/peer/'%peer['ip']
 	cur_srv = Server.objects.filter(isLocal=True)[0]
 	peer_data = {}
-	peer_data['node'] = cur_srv.name
-	peer_data['ip'] = cur_srv.ip
+	peer_data['node'] = cur_srv['name']
+	peer_data['ip'] = cur_srv['ip']
 	encoded_peer_data = urllib.parse.urlencode(peer_data)
 	data = encoded_peer_data.encode('utf-8')
 
