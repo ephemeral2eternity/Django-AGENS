@@ -46,6 +46,8 @@ def query(request):
 @csrf_exempt
 def add(request):
 	cur_host = get_local_name()
+	remote_host = request.META['REMOTE_HOST']
+	print("The video/add request sent by", remote_host)
 	if request.method == "POST":
 		print(request.POST)
 		srvs = request.POST.keys()
