@@ -2,3 +2,8 @@ db.sqlite3
 *.pyc
 */migrations/*
 */__pycache__/*
+./django_cron/__pycache__/*
+./django_cron/management/__pycache__/*
+./django_cron/management/commands/__pycache__/*
+./django_cron/backends/__pycache__/*
+./django_cron/backends/lock/__pycache__/*
