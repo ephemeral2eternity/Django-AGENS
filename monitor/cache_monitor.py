@@ -53,6 +53,7 @@ def update_overlay_load(load):
 	other_srvs = Server.objects.filter(isLocal=False)
 	for other_srv in other_srvs:
 		other_srv_ip = other_srv.ip
+		print('Update monitored load', load_dict, ' to server ', other_srv.name)
 		update_overlay_obj(other_srv_ip, load_dict)
 
 # ================================================================================
@@ -69,6 +70,7 @@ def bw_monitor():
 		previous_obj = BW.objects.all()[bw_list_len - 1]
 		cur_tx = get_tx_bytes()
 		cur_bw = float(cur_tx - previous_obj.tx) * 8 / (5 * 60 * 1024 * 1024)
+		print("[Django_crontab] Most Recent BW monitored:", str(cur_bw))
 	cur_bw_obj = BW(bw=cur_bw, tx=cur_tx)
 	cur_bw_obj.save()
 	update_overlay_bw(bw)
@@ -93,6 +95,7 @@ def update_overlay_bw(bw):
 	other_srvs = Server.objects.filter(isLocal=False)
 	for other_srv in other_srvs:
 		other_srv_ip = other_srv.ip
+		print('Update monitored bw', bw_dict, ' to server ', other_srv.name)
 		update_overlay_obj(other_srv_ip, bw_dict)
 
 # ================================================================================
