@@ -1,0 +1,13 @@
+<h1>Show all qoe traces on all servers</h1>
+{% if qoes %}
+    {% for key, value in qoes.items %}
+	<h3>All qoe traces for server : {{ key }}</h3>
+	<ul>
+		{% for qoe in value %}
+		<li>{{ qoe }}</li>
+		{% endfor %}
+	</ul>
+    {% endfor %}
+{% else %}
+    <p>The QoE trace has not been initialized. Please re-run http://cache_agent:port/qoe/init/ to initialize QoE!</p>
+{% endif %}
