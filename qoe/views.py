@@ -13,7 +13,7 @@ def index(request):
 @csrf_exempt
 def initQoE(request):
 	initializeQoE()
-	query(request)
+	return query(request)
 
 @csrf_exempt
 def query(request):
