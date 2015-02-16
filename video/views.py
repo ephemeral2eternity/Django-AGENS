@@ -81,7 +81,9 @@ def add(request):
 					new_vid_obj.save()
 					new_updates[srv].append(vid)
 					print("Video ", vid, " on server ", srv," has been added to cache table!")
+		print('Start forwarding the updates on this agent from', remote_host)
 		new_update_str = update_list2str(new_updates)
+		print('The updates are', new_update_str)
 		forward_updates(remote_host, new_update_str)
 		return HttpResponse("Successfully update video list cached on " + srv + "!")
 	elif request.method == "GET":
