@@ -65,11 +65,13 @@ def forward_updates(rcv_host, video_updates):
 # Update the videos in caching_list to a peer
 # ================================================================================
 def update_videos(peer_ip, caching_list):
+	local_host = get_local_name()
 	update_url = 'http://%s:8615/video/add/'%peer_ip
 	update_data = urllib.parse.urlencode(caching_list)
 	data = data.encode('utf-8')
 
 	req = urllib.request.Request(update_url, update_data)
+	req.add_header('agens-remote', local_host)
 	rsp = urllib.request.urlopen(req)
 	rspData = rsp.read()
 	print(rspData)
