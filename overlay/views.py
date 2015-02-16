@@ -73,6 +73,7 @@ def update(request):
 			srv_obj.load = int(update_dict['load'][0])
 		else:
 			print('Unrecognized update parameters in ', params)
+		srv_obj.save()
 	else:
 		print('Update messages needs to denote the server name in ', params)
 	return HttpResponse('Successfully update monitored value in overlay table!')
