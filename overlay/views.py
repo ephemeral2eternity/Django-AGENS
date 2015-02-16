@@ -60,6 +60,24 @@ def query(request):
 	return HttpResponse(templates.render(context))
 
 @csrf_exempt
+def update(request):
+	url = request.get_full_path()
+	params = url.split('?')[1]
+	update_dict = url.parse.parse_qs(params)
+	if 'srv' in update_dict.keys():
+		srv = update_dict['srv'][0]
+		srv_obj = Server.objects.filter(name=srv)[0]
+		if 'bw' in update_dict.keys():
+			srv_obj.bw = float(update_dict['bw'][0])
+		elif 'load' in update_dict.keys():
+			srv_obj.load = int(update_dict['load'][0])
+		else:
+			print('Unrecognized update parameters in ', params)
+	else:
+		print('Update messages needs to denote the server name in ', params)
+	return HttpResponse('Successfully update monitored value in overlay table!')
+
+@csrf_exempt
 def peer(request):
 	# Answer the peer request from an node
 	if request.method == "POST":
