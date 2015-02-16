@@ -25,7 +25,7 @@ def initializeQoE():
 # ================================================================================
 # Return the dict of QoE traces with key defined as server name
 # ================================================================================
-def getQoEDict():
+def getQoEStr():
 	qoe_dict = {}
 	srvs = Server.objects.all()
 	for s in srvs:

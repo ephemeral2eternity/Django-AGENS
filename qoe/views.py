@@ -17,7 +17,7 @@ def initQoE(request):
 
 @csrf_exempt
 def query(request):
-	qoe_dict = getQoEDict()
+	qoe_dict = getQoEStr()
 	print(qoe_dict)
 	templates = loader.get_template('qoe/qoes.html')
 	context = RequestContext(request, {
