@@ -28,11 +28,14 @@ def initServer(request):
 		srv_name = srv
 		srv_ip = cache_srv_ips[srv]
 		srv_rtt = getMnRTT(srv_ip, 5)
+		srv_qoe = 0.00
+		srv_load = 0
+		srv_bw = 0.00
 		isLocal = (srv == hostname)
 		if isLocal:
 			srv_rtt = 0.0
 		# print("Is ", srv, " the localhost? ", isLocal)
-		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt)
+		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, qoe=srv_qoe, load=srv_load, bw=srv_bw)
 		cur_srv.save()
 		print(srv_name, " is saved in the database!")
 
