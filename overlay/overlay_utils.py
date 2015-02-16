@@ -2,6 +2,8 @@ import json
 import socket
 import re
 import subprocess
+import urllib.request
+import urllib.parse
 from overlay.models import Server, Peer
 
 def get_cache_agents():
@@ -48,22 +50,21 @@ def get_host_name():
 
 def connect_overlay():
 	other_srvs = Server.objects.filter(isLocal=False)
-	other_srv_list = list(other_srvs)
 	# Find the closest node to peer with
-	to_connect = find_closest(other_srv_list)
+	to_connect = find_closest(other_srvs)
 	if peer_with(to_connect):
 		print("Successfull peer with agent: ", to_connect.name)
 	else:
 		print("Failed to peer with agent: ", to_connect.name)
-		other_srv_list.pop(to_connect)
-		to_connect = find_closest(other_srv_list)
-		print("Retry to peer with agent: ", to_connect.name)
-		peer_with(to_connnect.ip)
+		#other_srv_list.pop(to_connect)
+		#to_connect = find_closest(other_srv_list)
+		#print("Retry to peer with agent: ", to_connect.name)
+		#peer_with(to_connnect.ip)
 		
 
 def find_closest(srvs):
 	to_connect = srvs[0]
-	if srvs.count() > 1:
+	if len(srvs) > 1:
 		for srv in srvs:
 			if srv.rtt < to_connect.rtt:
 				to_connect = srv
@@ -71,7 +72,7 @@ def find_closest(srvs):
 
 def peer_with(peer):
 	url = 'http://%s:8615/overlay/peer/'%peer.ip
-	cur_srv = Server.objects.filter(isLocal=True)
+	cur_srv = Server.objects.filter(isLocal=True)[0]
 	peer_data = {}
 	peer_data['node'] = cur_srv.name
 	peer_data['ip'] = cur_srv.ip

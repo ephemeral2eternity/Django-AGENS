@@ -27,7 +27,7 @@ def initServer(request):
 		srv_id = int(re.findall(r'\d+', srv)[0])
 		srv_name = srv
 		srv_ip = cache_srv_ips[srv]
-		srv_rtt = 255.0
+		srv_rtt = getMnRTT(srv_ip, 5)
 		isLocal = (srv == hostname)
 		if isLocal:
 			srv_rtt = 0.0
@@ -63,7 +63,8 @@ def query(request):
 def peer(request):
 	# Answer the peer request from an node
 	if request.method == "POST":
-		print(request.POST)
+		print("overlay/peer request:", request.POST)
+		print("overlay/peer request keys:", request.POST.keys())
 		peer_node = request.POST.get("node", "")
 		print("node info in request:", peer_node)
 		peer_id  = int(re.findall(r'\d+', peer_node)[0])
