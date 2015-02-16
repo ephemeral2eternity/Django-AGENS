@@ -65,22 +65,22 @@ def add(request):
 					vid_obj = Video.objects.get(id=vid_id)
 					# print("Video object with id = ", vid_id, " found in local cache table!")
 					vid_srv_list = vid_obj.srvs.split(', ')
-					# print("Video server list in cache table:", vid_srv_list)
+					print("Video server list in cache table:", vid_srv_list)
 					if srv not in vid_srv_list:
 						vid_obj.srvs = vid_obj.srvs + srv + ', '
 						new_updates[srv].append(vid)
-						# print("New srvs for video ", vid, " is ", vid_obj.srvs)
+						print("New srvs for video ", vid, " is ", vid_obj.srvs)
 						vid_obj.save()
-					# print("Server ", srv, " has been added to Video ", vid, " in cache table!")
+					print("Server ", srv, " has been added to Video ", vid, " in cache table!")
 				else:
 					vid_name = 'BBB'
 					isLocal = False
 					vid_srvs = srv + ', '
-					# print("srvs for video ", vid, " is ", vid_srvs)
+					print("srvs for video ", vid, " is ", vid_srvs)
 					new_vid_obj = Video(id=vid_id, name=vid_name, isLocal=isLocal, srvs=vid_srvs)
 					new_vid_obj.save()
 					new_updates[srv].append(vid)
-					# print("Video ", vid, " on server ", srv," has been added to cache table!")
+					print("Video ", vid, " on server ", srv," has been added to cache table!")
 		new_update_str = update_list2str(new_updates)
 		forward_updates(remote_host, new_update_str)
 		return HttpResponse("Successfully update video list cached on " + srv + "!")
