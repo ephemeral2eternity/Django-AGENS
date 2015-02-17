@@ -31,7 +31,11 @@ def load_monitor():
 		print("[Django_crontab] Current Load: " + str(load_diff))
 	cur_load = Load(load=load_diff, total=total_load)
 	cur_load.save()
-	update_overlay_load(load_diff)
+	try:
+		update_overlay_load(load_diff)
+	except:
+		print("Not be able to update all other cache agent about monitored load!")
+		continue
 	print("[Django_crontab] Finished updating new load to all other servers!")
 
 # ================================================================================
@@ -76,8 +80,12 @@ def bw_monitor():
 		print("[Django_crontab] Most Recent BW monitored:", str(cur_bw))
 	cur_bw_obj = BW(bw=cur_bw, tx=cur_tx)
 	cur_bw_obj.save()
-	update_overlay_bw(cur_bw)
-	
+	try:
+		update_overlay_bw(cur_bw)
+	except:
+		print('Not be able to update all other cache agent about self monitored bw!')
+		continue
+
 # ================================================================================
 # Save the updated bw in the overlay table 
 # ================================================================================
