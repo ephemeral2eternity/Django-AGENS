@@ -32,6 +32,7 @@ def load_monitor():
 	cur_load.save()
 	print("[Django_crontab] Finished saving new load item")
 	update_overlay_load(load)
+	print("[Django_crontab] Finished updating new load to all other servers!")
 
 # ================================================================================
 # Save the updated load in the overlay table 
@@ -43,6 +44,7 @@ def update_overlay_load(load):
 	cur_srv_obj = Server.objects.filter(isLocal=True)[0]
 	cur_srv_obj.load = load
 	cur_srv_obj.save()
+	print("[Django_crontab] Finished saving new load to local server, ", cur_srv_obj.name)
 
 	## Update other servers about local load
 	load_dict = {}
