@@ -1,3 +1,4 @@
+import urllib.parse
 from django.shortcuts import render
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -24,3 +25,26 @@ def query(request):
 					'qoes' : qoe_dict,
 	})
 	return HttpResponse(templates.render(context))
+
+@csrf_exempt
+def update(request):
+	url = request.get_full_path()
+	params = url.split('?')[1]
+	update_dict = urllib.parse.parse_qs(params)
+	print(update_dict)
+	if 'srv' in update_dict.keys():
+		srv = update_dict['srv'][0]
+		if 'qoe' in update_dict.keys():
+			qoe = float(update_dict['qoe'][0])
+			if 'alpha' in update_dict.keys():
+				alpha = float(update_dict['alpha'][0])
+			else:
+				alpha = 0.1
+			updateQoE(srv, qoe, alpha)
+		else:
+			print('QoE update message needs to denote the qoe in request ', params)
+			raise Http404
+	else:
+		print('QoE update message needs to denote the server name in request ', params)
+		raise Http404
+	return HttpResponse('Successfully update QoE value!')

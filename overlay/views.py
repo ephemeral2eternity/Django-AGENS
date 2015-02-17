@@ -84,6 +84,7 @@ def update(request):
 		srv_obj.save()
 	else:
 		print('Update messages needs to denote the server name in ', params)
+		raise Http404
 	return HttpResponse('Successfully update monitored value in overlay table!')
 
 @csrf_exempt

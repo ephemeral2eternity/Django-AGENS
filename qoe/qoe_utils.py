@@ -46,8 +46,10 @@ def getQoEStr():
 # ================================================================================
 def updateQoE(srv, qoe, alpha):
 	last_qoe = QoE.objects.filter(srv=srv).order_by('-time')[0]
-	previous_qoe = last_qoe.qoe
+	print('Last qoe value for server ', srv, ' is ', last_qoe.qoe)
+	previous_qoe = float(last_qoe.qoe)
 	new_qoe = (1 - alpha) * previous_qoe + alpha * qoe
+	print('New qoe is ', new_qoe)
 	new_qoe_obj = QoE(qoe=new_qoe, srv=srv)
 	new_qoe_obj.save()
 	update_overlay_qoe(srv, new_qoe)
@@ -61,3 +63,4 @@ def update_overlay_qoe(srv, qoe):
 	srv_obj = Server.objects.filter(name=srv)[0]
 	srv_obj.qoe = qoe
 	srv_obj.save()
+	print('Successfully update qoe for server, ', srv, ' in the overlay table!')
