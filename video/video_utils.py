@@ -43,7 +43,7 @@ def get_real_local_videos():
 def periodic_discover():
 	caching_list = {}
 	cur_host = get_local_name()
-	local_videos = Video.objects.all().values_list('id')
+	local_videos = Video.objects.filter(isLocal=True).values_list('id')
 	local_video_id_str = ', '.join(str(vid[0]) for vid in local_videos)
 	caching_list[cur_host] = local_video_id_str
 	peers = Peer.objects.all()
