@@ -7,6 +7,7 @@ import string,cgi,time
 import sys
 import shutil
 import socket
+import urllib.request, urllib.parse
 from monitor.models import Load, BW
 from overlay.models import Server
 
@@ -30,8 +31,7 @@ def load_monitor():
 		print("[Django_crontab] Current Load: " + str(load_diff))
 	cur_load = Load(load=load_diff, total=total_load)
 	cur_load.save()
-	print("[Django_crontab] Finished saving new load item")
-	update_overlay_load(load)
+	update_overlay_load(load_diff)
 	print("[Django_crontab] Finished updating new load to all other servers!")
 
 # ================================================================================
@@ -39,6 +39,7 @@ def load_monitor():
 # ================================================================================
 def update_overlay_load(load):
 	cur_srv = get_host_name()
+	print("[Django_crontab] It is inside update_overlay_load!")
 
 	## Update load on local server
 	cur_srv_obj = Server.objects.filter(isLocal=True)[0]
@@ -75,7 +76,7 @@ def bw_monitor():
 		print("[Django_crontab] Most Recent BW monitored:", str(cur_bw))
 	cur_bw_obj = BW(bw=cur_bw, tx=cur_tx)
 	cur_bw_obj.save()
-	update_overlay_bw(bw)
+	update_overlay_bw(cur_bw)
 	
 # ================================================================================
 # Save the updated bw in the overlay table 
