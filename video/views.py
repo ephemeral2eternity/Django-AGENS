@@ -98,12 +98,12 @@ def add(request):
 def getSrv(request):
 	url = request.get_full_path()
 	params = url.split('?')[1]
-	request_dict = urllib.parse.parse_qs(parmas)
+	request_dict = urllib.parse.parse_qs(params)
 	print(request_dict)
 	if 'vidID' in request_dict.keys():
-		vidID = int(request_dict['vidID'])
+		vidID = int(request_dict['vidID'][0])
 		if 'method' in request_dict.keys():
-			method = request_dict['method']
+			method = request_dict['method'][0]
 		else:
 			method = 'qoe'
 		# Call the get_server method 

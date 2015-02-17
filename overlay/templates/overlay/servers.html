@@ -6,6 +6,7 @@
 <h2>All available cache servers observed from the current server are:</h2>
 <table style="width:80%">
     <tr>
+	<td> Cache Server ID</td>
 	<td> Cache Server Name</td>
 	<td> IP Address</td>
 	<td> RTT to {{ curSrv.name }} </td>
@@ -15,6 +16,7 @@
     <tr>
     {% for srv in srvs %}
     <tr>
+        <td> {{ srv.id }} </td>
         <td> {{ srv.name }} </td>
 	<td> {{ srv.ip }} </td>
 	<td> {{ srv.rtt }} </td>

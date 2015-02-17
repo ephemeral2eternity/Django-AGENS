@@ -110,19 +110,21 @@ def get_server(vidID, method):
 	curVid = Video.objects.get(pk=vidID)
 	vidName = curVid.name
 	srvs = curVid.srvs.split(',')
+	srvs.pop()
 	srvs_vals = {}
 	selected_srv = {}
 	
 	# Read the load/rtt/qoe from the overlay table
 	for srv in srvs:
-		srv_id = int(re.findall(r'\d', srv)[0])
+		srv_id = int(re.findall(r'\d+', srv)[0])
+		print("Check Server", srv, 'with srv_id', srv_id)
 		srv_obj = Server.objects.get(pk=srv_id)
-		if method == 'QoE':
-			srvs_vals[srv_id] = float(5.0 - srv_obj.qoe)
+		if method == 'qoe':
+			srvs_vals[srv_id] = 5.0 - float(srv_obj.qoe)
 		elif method == 'load':
 			srvs_vals[srv_id] = int(srv_obj.load)
 		elif method == 'rtt':
-			srv_vals[srv_id] = float(srv_obj.rtt)
+			srvs_vals[srv_id] = float(srv_obj.rtt)
 		else:
 			print('Unrecognized method: ', method, ". Returning empty server!")
 			return selected_srv
