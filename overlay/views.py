@@ -77,6 +77,8 @@ def update(request):
 			srv_obj.bw = float(update_dict['bw'][0])
 		elif 'load' in update_dict.keys():
 			srv_obj.load = int(update_dict['load'][0])
+		elif 'qoe' in update_dict.keys():
+			srv_obj.qoe = float(update_dict['qoe'][0])
 		else:
 			print('Unrecognized update parameters in ', params)
 		srv_obj.save()
