@@ -2,9 +2,10 @@
 import socket
 import os
 import ntpath
+import re
 import urllib.request
 import urllib.parse
-from overlay.models import Peer
+from overlay.models import Server, Peer
 from video.models import Video
 
 def get_local_videos():
@@ -95,6 +96,44 @@ def update_list2str(update_list):
 			vid_list_str = ', '.join(str(vid) for vid in vid_list)
 			update_str[srv] = vid_list_str
 	return update_str
+
+# ================================================================================
+# Get the server for a video request based on method denoted by the user
+# @input : vidID ---- the ID of the video user is requesting
+#          method ---- the method that the agent selects the server
+#                      available methods include 'qoe', 'load', 'rtt'
+#                      'qoe' : always selects the server with best QoE
+#		       'load' : always selects the server with the lightest load
+#                      'rtt' : always selects the server with the smallest rtt
+# ================================================================================
+def get_server(vidID, method):
+	curVid = Video.objects.get(pk=vidID)
+	vidName = curVid.name
+	srvs = curVid.srvs.split(',')
+	srvs_vals = {}
+	selected_srv = {}
+	
+	# Read the load/rtt/qoe from the overlay table
+	for srv in srvs:
+		srv_id = int(re.findall(r'\d', srv)[0])
+		srv_obj = Server.objects.get(pk=srv_id)
+		if method == 'QoE':
+			srvs_vals[srv_id] = float(5.0 - srv_obj.qoe)
+		elif method == 'load':
+			srvs_vals[srv_id] = int(srv_obj.load)
+		elif method == 'rtt':
+			srv_vals[srv_id] = float(srv_obj.rtt)
+		else:
+			print('Unrecognized method: ', method, ". Returning empty server!")
+			return selected_srv
+
+	# Select the server with the least value in srvs_vals
+	selected_srv_id = min(srvs_vals, key=lambda k : srvs_vals[k])
+	selected_srv_obj = Server.objects.get(pk=selected_srv_id)
+	selected_srv['srv'] = selected_srv_obj.name
+	selected_srv['ip'] = selected_srv_obj.ip
+	selected_srv['vidName'] = vidName
+	return selected_srv
 
 #cached_videos = get_real_local_videos()
 #print(cached_videos)

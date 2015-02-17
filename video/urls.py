@@ -6,4 +6,5 @@ urlpatterns = patterns('',
 	url(r'^init/', views.initVideo, name='init'),
 	url(r'^query/', views.query, name='query'),
 	url(r'^add/', views.add, name='add'),
+	url(r'^getSrv', views.getSrv, name='getSrv'),
 )

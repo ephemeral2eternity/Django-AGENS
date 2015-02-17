@@ -1,4 +1,6 @@
 import random
+import urllib.parse
+import json
 from collections import defaultdict
 from django.shortcuts import render
 from django.http import Http404
@@ -88,3 +90,26 @@ def add(request):
 		return HttpResponse("Successfully update video list cached on " + srv + "!")
 	elif request.method == "GET":
 		return HttpResponse("You should use POST method when calling http://cache_agent:port/video/add/ to add video lists!")
+
+# ================================================================================
+# Return the server name and ip address to the user
+# ================================================================================
+@csrf_exempt
+def getSrv(request):
+	url = request.get_full_path()
+	params = url.split('?')[1]
+	request_dict = urllib.parse.parse_qs(parmas)
+	print(request_dict)
+	if 'vidID' in request_dict.keys():
+		vidID = int(request_dict['vidID'])
+		if 'method' in request_dict.keys():
+			method = request_dict['method']
+		else:
+			method = 'qoe'
+		# Call the get_server method 
+		srv_dict = get_server(vidID, method)
+	else:
+		raise Http404
+	response = HttpResponse(str(srv_dict))
+	response['Params'] = json.dumps(srv_dict)
+	return response	
