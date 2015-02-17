@@ -1,4 +1,5 @@
 import urllib.parse
+import socket
 from django.shortcuts import render
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -18,10 +19,12 @@ def initQoE(request):
 
 @csrf_exempt
 def query(request):
+	cur_host = str(socket.gethostname())
 	qoe_dict = getQoEStr()
 	print(qoe_dict)
 	templates = loader.get_template('qoe/qoes.html')
 	context = RequestContext(request, {
+					'localhost' : cur_host,
 					'qoes' : qoe_dict,
 	})
 	return HttpResponse(templates.render(context))
