@@ -21,7 +21,9 @@ def initializeQoE():
 			q = 4.0
 		cur_qoe = QoE(qoe=q, srv=s.name)
 		cur_qoe.save()
-		update_overlay_qoe(s.name, q)
+		s.qoe = q
+		s.save()
+		# update_overlay_qoe(s.name, q)
 
 # ================================================================================
 # Return the dict of QoE traces with key defined as server name
@@ -59,8 +61,8 @@ def updateQoE(srv, qoe, alpha):
 # @input : srv ---- the server to update qoe
 #	   qoe ---- new qoe value to be updated in overlay table
 # ================================================================================
-def update_overlay_qoe(srv, qoe):
-	srv_obj = Server.objects.filter(name=srv)[0]
-	srv_obj.qoe = qoe
-	srv_obj.save()
-	print('Successfully update qoe for server, ', srv, ' in the overlay table!')
+# def update_overlay_qoe(srv, qoe):
+#	srv_obj = Server.objects.filter(name=srv)[0]
+#	srv_obj.qoe = qoe
+#	srv_obj.save()
+#	print('Successfully update qoe for server, ', srv, ' in the overlay table!')
