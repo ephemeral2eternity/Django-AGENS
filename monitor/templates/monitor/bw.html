@@ -1,10 +1,21 @@
 <h1>Show the 30 recent bw monitored on this agent!</h1>
 {% if bw_list %}
-    <ul>
+<table style="width:90%">
+    <tr>
+	<td>Monitored ID</td>
+	<td>Monitored Time</td>
+	<td>Monitored BW in 5 minutes (Mbps)</td>
+	<td>Total Outbound Traffic (Bytes)</td>
+    </tr>
     {% for item in bw_list %}
-        <li>Time probed at: {{ item.time }} &nbsp;&nbsp;&nbsp; Per 5 minutes bw: {{ item.bw }} Mbps &nbsp;&nbsp;&nbsp; Total tx_bytes: {{ item.tx }}</li>
+    <tr>
+	<td> {{ item.id }} </td>
+	<td> {{ item.time }} </td>
+	<td> {{ item.bw }} </td>
+	<td> {{ item.tx }} </td>
+    </tr>
     {% endfor %}
-    </ul>
+</table>
 {% else %}
     <p>No bw has been monitored yet.</p>
 {% endif %}
