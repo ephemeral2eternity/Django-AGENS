@@ -3,6 +3,7 @@
 # chenw@cmu.edu
 import json
 import re
+import subprocess
 from qoe.models import QoE
 from overlay.models import Server
 
@@ -68,3 +69,13 @@ def update_overlay_qoe(srv, qoe):
 	srv_obj.qoe = qoe
 	srv_obj.save()
 	print('Successfully update qoe for server, ', srv, ' in the overlay table!')
+
+# ================================================================================
+# Define a function to update a file to a google cloud storage bucket
+# ================================================================================
+def gcs_upload(bucketName, uploadFile):
+	# Execute gsutil command to upload the file "uploadFile"
+	# authFile = "./info/auth.json"
+	# gcs_authenticate(authFile)
+	subprocess.call(["gsutil", "cp", uploadFile, "gs://" + bucketName])
+

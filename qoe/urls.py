@@ -6,4 +6,5 @@ urlpatterns = patterns('',
 	url(r'^init/', views.initQoE, name='init'),
 	url(r'^query/', views.query, name='query'),
 	url(r'^update', views.update, name='update'),
+	url(r'^dump/', views.dump, name='dump'),
 )
