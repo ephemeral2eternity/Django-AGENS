@@ -2,6 +2,7 @@
 # Chen Wang, Feb. 16, 2015
 # chenw@cmu.edu
 import json
+import re
 from qoe.models import QoE
 from overlay.models import Server
 
@@ -61,8 +62,9 @@ def updateQoE(srv, qoe, alpha):
 # @input : srv ---- the server to update qoe
 #	   qoe ---- new qoe value to be updated in overlay table
 # ================================================================================
-# def update_overlay_qoe(srv, qoe):
-#	srv_obj = Server.objects.filter(name=srv)[0]
-#	srv_obj.qoe = qoe
-#	srv_obj.save()
-#	print('Successfully update qoe for server, ', srv, ' in the overlay table!')
+def update_overlay_qoe(srv, qoe):
+	srv_id = int(re.findall(r'\d+', srv)[0])
+	srv_obj = Server.objects.get(pk=srv_id)
+	srv_obj.qoe = qoe
+	srv_obj.save()
+	print('Successfully update qoe for server, ', srv, ' in the overlay table!')
