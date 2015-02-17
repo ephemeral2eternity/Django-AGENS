@@ -61,7 +61,9 @@ def query(request):
 					'srvs' : srv_list,
 					'peers' : peer_list,
 	})
-	return HttpResponse(templates.render(context))
+	rsp = HttpResponse(templates.render(context))
+	rsp['agens-peers'] = ', '.join(peer.name for peer in peer_list)
+	return rsp
 
 @csrf_exempt
 def update(request):
