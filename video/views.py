@@ -47,6 +47,11 @@ def query(request):
 	return HttpResponse(templates.render(context))
 
 @csrf_exempt
+def discover(request):
+	periodic_discover()
+	return HttpResponse("Broadcast local cached videos to all other nodes!")
+
+@csrf_exempt
 def add(request):
 	cur_host = get_local_name()
 	remote_host = request.META['HTTP_AGENS_REMOTE']
