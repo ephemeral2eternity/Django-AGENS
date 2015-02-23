@@ -15,3 +15,12 @@ class load_job(CronJobBase):
 	def do(self):
 		load_monitor()
 		bw_monitor()
+
+class monitor_dump_job(CronJobBase):
+	# Run every day at mid night
+	RUN_AT_TIMES = ['23:55']
+	schedule = Schedule(run_at_times=RUN_AT_TIMES)
+
+	# This will be executed every day at 23:55
+	def do(self):
+		dump_monitor()

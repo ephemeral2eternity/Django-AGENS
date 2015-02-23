@@ -94,6 +94,7 @@ STATIC_URL = '/static/'
 # CRONTAB_LOCK_JOBS = True
 CRON_CLASSES = [
 	"monitor.cron.load_job",
+	"monitor.cron.monitor_dump_job",
 	"overlay.cron.ping_job",
 	"video.cron.video_update_job",
 	# ...

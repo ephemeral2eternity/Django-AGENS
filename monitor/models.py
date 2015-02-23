@@ -16,3 +16,10 @@ class BW(models.Model):
 
 	def __str__(self):
 		return str(self.bw)
+
+class RTTS(models.Model):
+	rtts = models.CharField(max_length=9999)
+	time = models.DateTimeField(auto_now_add=True)
+
+	def __str__(self):
+		return rtts

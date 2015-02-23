@@ -1,4 +1,6 @@
-<h1>Show the 30 recent bw monitored on this agent!</h1>
+{% if cur_host %}
+<h1>Show the 30 recent bw monitored on this agent: {{ cur_host }}</h1>
+{% endif %}
 {% if bw_list %}
 <table style="width:90%">
     <tr>
