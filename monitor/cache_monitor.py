@@ -129,6 +129,8 @@ def dump_monitor():
         load_cnt = all_load.count()
         all_bw = BW.objects.all()
         bw_cnt = all_bw.count()
+        all_rtts = RTTS.objects.all()
+        rtts_cnt = all_rtts.count()
 
         # export load objects to json file and only leave the most 10 recent objects
         load = {}
@@ -150,12 +152,23 @@ def dump_monitor():
                         bw_obj.delete()
                 n = n + 1
 
+        # export rtt objects to json file and only leave the most 10 recent objects
+        rtts = {}
+        n = 0
+        for rtt_obj in all_rtts:
+                cur_ts = int(time.mktime(rtt_obj.time.timetuple()))
+                rtts[cur_ts] = json.load(rtt_obj.rtts)
+                if n < rtts_cnt - 10:
+                        rtt_obj.delete()
+                n = n + 1
+
         cur_file_path = os.path.realpath(__file__)
         cur_path, cur_file_name = ntpath.split(cur_file_path)
         cur_host_name = str(socket.gethostname())
         ts = time.strftime('%m%d%H%M')
         load_file = cur_path + '/tmp/' + cur_host_name + '_' + ts + '_load.json'
         bw_file = cur_path + '/tmp/' + cur_host_name + '_' + ts + '_bw.json'
+        rtts_file = cur_path + '/tmp/' + cur_host_name + '_' + ts + '_rtts.json'
 
         with open(load_file, 'w') as outfile:
                 json.dump(load, outfile, sort_keys=True, indent=4, ensure_ascii=False)
@@ -163,8 +176,12 @@ def dump_monitor():
         with open(bw_file, 'w') as outfile:
                 json.dump(bw, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
+        with open(rtts_file, 'w') as outfile:
+                json.dump(rtts, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
         gcs_upload('agens-data', load_file)
         gcs_upload('agens-data', bw_file)
+        gcs_upload('agens-data', rtts_file)
         return ts
 
 # ================================================================================
