@@ -5,10 +5,14 @@
 import json
 import string,cgi,time
 import sys
+import os
 import shutil
 import socket
+import ntpath
+import codecs
 import urllib.request, urllib.parse
-from monitor.models import Load, BW
+from monitor.models import Load, BW, RTTS
+from monitor.gcs_upload import *
 from overlay.models import Server
 
 # ================================================================================
@@ -157,7 +161,8 @@ def dump_monitor():
         n = 0
         for rtt_obj in all_rtts:
                 cur_ts = int(time.mktime(rtt_obj.time.timetuple()))
-                rtts[cur_ts] = json.load(rtt_obj.rtts)
+                ## reader = codecs.getreader("utf-8")
+                rtts[cur_ts] = json.loads(str(rtt_obj.rtts))
                 if n < rtts_cnt - 10:
                         rtt_obj.delete()
                 n = n + 1
