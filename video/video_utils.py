@@ -5,6 +5,7 @@ import ntpath
 import re
 import urllib.request
 import urllib.parse
+import random
 from overlay.models import Server, Peer
 from video.models import Video
 
@@ -125,6 +126,10 @@ def get_server(vidID, method):
 			srvs_vals[srv_id] = int(srv_obj.load)
 		elif method == 'rtt':
 			srvs_vals[srv_id] = float(srv_obj.rtt)
+		elif method == 'hop':
+			srvs_vals[srv_id] = float(srv_obj.hop)
+		elif method == 'random':
+			srvs_vals[srv_id] = random.random()
 		else:
 			print('Unrecognized method: ', method, ". Returning empty server!")
 			return selected_srv
