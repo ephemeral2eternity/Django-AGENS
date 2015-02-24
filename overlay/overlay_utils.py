@@ -6,6 +6,11 @@ import urllib.request
 import urllib.parse
 from overlay.models import Server, Peer
 
+# ================================================================================
+# Get the dictionary storing info about all cache agents
+# @return : dictionary storing info of all cache agents
+#	    keys are denoting name, zone, type, ip of all cache agents
+# ================================================================================
 def get_cache_agents():
         # List all instances
         proc = subprocess.Popen("gcloud compute instances list", stdout=subprocess.PIPE, shell=True)
@@ -28,6 +33,9 @@ def get_cache_agents():
 
         return cache_agents
 
+# ================================================================================
+# Get all cache agent names as a list
+# ================================================================================
 def get_cache_agent_names():
 	nodes = get_cache_agents()
 	agent_names = []
@@ -35,6 +43,12 @@ def get_cache_agent_names():
 		agent_names.append(node['name'])
 	return agent_names
 
+# ================================================================================
+# Get all IP addresses of all cache agents
+# @return : dictionary storing ip addresses for all cache agents
+# 	    key ---- the cache agent name
+# 	    value ---- the cache agent ip
+# ================================================================================
 def get_cache_agent_ips():
         cache_agents = get_cache_agents()
 
@@ -45,6 +59,9 @@ def get_cache_agent_ips():
 
         return agent_ips
 
+# ================================================================================
+# Get the local host name
+# ================================================================================
 def get_host_name():
 	return str(socket.gethostname())
 
@@ -105,6 +122,17 @@ def find_closest(srvs):
 			if srv['rtt'] < to_connect['rtt']:
 				to_connect = srv
 	return to_connect
+
+# ================================================================================
+# Get the hop number from the current host to the IP adress
+# @input : srv_ip ---- the ip address the traceroute is probing
+# @return : the hop number to srv_ip
+# ================================================================================
+def get_hop_count(srv_ip):
+	proc = subprocess.Popen(['traceroute', srv_ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	(stdout, stderr) = proc.communicate()
+	hop_count = stdout.decode('ascii').count('\n') - 1
+	return hop_count
 
 # ================================================================================
 # Peer with a peer node

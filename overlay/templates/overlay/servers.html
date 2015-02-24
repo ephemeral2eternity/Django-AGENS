@@ -4,12 +4,13 @@
 {% endif %}
 {% if srvs %}
 <h2>All available cache servers observed from the current server are:</h2>
-<table style="width:80%">
+<table style="width:100%">
     <tr>
 	<td> Cache Server ID</td>
 	<td> Cache Server Name</td>
 	<td> IP Address</td>
 	<td> RTT to {{ curSrv.name }} </td>
+	<td> Hop number to {{ curSrv.name }} </td>
 	<td> Recent QoE Evaluated (0-5) </td>
 	<td> Recent Load Monitored (# of requests per 5 minutes) </td>
 	<td> Recent BW Monitored (Mbps) </td>
@@ -20,6 +21,7 @@
         <td> {{ srv.name }} </td>
 	<td> {{ srv.ip }} </td>
 	<td> {{ srv.rtt }} </td>
+	<td> {{ srv.hop }} </td>
 	<td> {{ srv.qoe }} </td>
 	<td> {{ srv.load }} </td>
 	<td> {{ srv.bw }} </td>

@@ -96,6 +96,7 @@ CRON_CLASSES = [
 	"monitor.cron.load_job",
 	"monitor.cron.monitor_dump_job",
 	"overlay.cron.ping_job",
+	"overlay.cron.hop_job",
 	"video.cron.video_update_job",
 	"qoe.cron.qoe_dump_job",
 	# ...
