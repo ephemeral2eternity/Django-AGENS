@@ -11,7 +11,7 @@ class ping_job(CronJobBase):
 	"""
 
 	# Run every 1 hour
-	run_every = 5
+	run_every = 1
 	schedule = Schedule(run_every_mins=run_every)
 	code = 'overlay.cron.ping_job'
 
@@ -21,7 +21,7 @@ class ping_job(CronJobBase):
 		srvs = Server.objects.filter(isLocal=False)
 		for srv in srvs:
 			print("Pinging ", srv.name)
-			srv_rtt = getMnRTT(srv.ip, 5)
+			srv_rtt = getMnRTT(srv.ip, 2)
 			srv.rtt = srv_rtt
 			print("RTT is:", str(srv_rtt))
 			srv.save()

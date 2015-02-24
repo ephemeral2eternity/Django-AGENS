@@ -7,7 +7,7 @@ class load_job(CronJobBase):
 	"""
 
 	# Run every 1 minute
-	run_every = 5
+	run_every = 1
 	schedule = Schedule(run_every_mins=run_every)
 	code = 'monitor.cron.load_job'
 
