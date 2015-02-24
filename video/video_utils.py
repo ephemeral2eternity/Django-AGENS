@@ -127,12 +127,13 @@ def get_server(vidID, method):
 		elif method == 'rtt':
 			srvs_vals[srv_id] = float(srv_obj.rtt)
 		elif method == 'hop':
-			srvs_vals[srv_id] = float(srv_obj.hop)
+			srvs_vals[srv_id] = int(srv_obj.hop)
 		elif method == 'random':
 			srvs_vals[srv_id] = random.random()
 		else:
 			print('Unrecognized method: ', method, ". Returning empty server!")
 			return selected_srv
+	# print(srvs_vals)
 
 	# Select the server with the least value in srvs_vals
 	selected_srv_id = min(srvs_vals, key=lambda k : srvs_vals[k])
