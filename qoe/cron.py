@@ -7,7 +7,7 @@ class qoe_dump_job(CronJobBase):
 	"""
 
 	# Run every day
-	RUN_AT_TIMES = ['23:55']
+	RUN_AT_TIMES = ['05:00']
 	schedule = Schedule(run_at_times=RUN_AT_TIMES)
 	code = 'qoe.cron.qoe_dump_job'
 
