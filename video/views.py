@@ -19,19 +19,7 @@ def index(request):
 @csrf_exempt
 def initVideo(request):
 	# Delete all objects in the table first
-	existing_videos = Video.objects.all()
-	if existing_videos.count() > 0:
-		existing_videos.delete()
-	cached_videos = get_local_videos()
-	real_cached_videos = get_real_local_videos()
-	hostname = get_local_name()
-	for vid in cached_videos:
-		vid_id = vid
-		vid_name = random.choice(real_cached_videos)
-		vid_srvs = hostname + ', '
-		# print("Is ", srv, " the localhost? ", isLocal)
-		cur_vid = Video(id=vid_id, name=vid_name, srvs=vid_srvs)
-		cur_vid.save()
+	init_cache_table()
 	return query(request)
 
 @csrf_exempt

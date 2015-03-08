@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from overlay.models import Server, Peer
 from overlay.overlay_utils import *
 from overlay.ping import *
+from video.video_utils import *
 
 # Create your views here.
 # The page returned for the request: http://cache_agent_ip:port/overlay/
@@ -16,36 +17,13 @@ def index(request):
 
 @csrf_exempt
 def initServer(request):
-	# Delete all objects in the table first
-	existing_srvs = Server.objects.all()
-	if existing_srvs.count() > 0:
-		existing_srvs.delete()
-	cache_srv_ips = get_cache_agent_ips()
-	hostname = get_host_name()
-	print("Obtained cache_srv_ips are", cache_srv_ips)
-	print("Current host name is :", hostname)
-	for srv in cache_srv_ips.keys():
-		srv_id = int(re.findall(r'\d+', srv)[0])
-		srv_name = srv
-		srv_ip = cache_srv_ips[srv]
-		srv_rtt = getMnRTT(srv_ip, 5)
-		srv_qoe = 0.00
-		srv_load = 0
-		srv_bw = 0.00
-		isLocal = (srv == hostname)
-		if isLocal:
-			srv_rtt = 0.0
-		# print("Is ", srv, " the localhost? ", isLocal)
-		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, qoe=srv_qoe, load=srv_load, bw=srv_bw)
-		cur_srv.save()
-		print(srv_name, " is saved in the database!")
+	init_overlay_table()
 
 	# Delete all objects in the table Peer
 	existing_peers = Peer.objects.all()
 	if existing_peers.count() > 0:
 		existing_peers.delete()
 	connect_overlay()
-	
 	return query(request)
 
 @csrf_exempt
@@ -105,4 +83,48 @@ def peer(request):
 		return HttpResponse("Successfully peering with agent " + get_host_name() + ".")
 	elif request.method == "GET":
 		print("The requested url is: ", request.get_full_path())
-		return HttpResponse("Please use POST method to peer with an agent when using http://cache_agent:port/overlay/peer/.")	
+		return HttpResponse("Please use POST method to peer with an agent when using http://cache_agent:port/overlay/peer/.")
+
+# ===========================================================================================================
+# Remove a certain item from overlay table or from peer list
+# @input: request ---- http://cache_agent_ip:8615/overlay/remove?srv=srvName
+#	  		remove server item named srvName from current overlay table
+# 		       http://cache_agent_ip:8615/overlay/remove?peer=peerName
+#	  		remove peer item named peerName from current peer list
+# ===========================================================================================================
+@csrf_exempt
+def delete_obj(request):
+	http_rsp_str = ""
+	url = request.get_full_path()
+	params = url.split('?')[1]
+	print("Got url with params: ", params)
+	to_delete_dict = urllib.parse.parse_qs(params)
+	if 'peer' in to_delete_dict.keys():
+		to_del_peer = to_delete_dict['peer'][0]
+		del_peer(to_del_peer)
+	if 'srv' in to_delete_dict.keys():
+		to_del_srv = to_delete_dict['srv'][0]
+		del_srv(to_del_srv)
+		
+	num_peers = Peer.objects.all().count()
+	if num_peers <= 0:
+		connect_overlay()
+	
+	return query(request)
+
+@csrf_exempt
+def delete(request):
+	delete_node()
+	return HttpResponse("Successfully delete current node from all peers' peer list and server list! The node is free to be destroyed!")
+
+@csrf_exempt
+def add(request):
+	url = request.get_full_path()
+	params = url.split('?')[1]
+	print("Got url with params: ", params)
+	to_add_dict = urllib.parse.parse_qs(params)
+	if 'srv' in to_add_dict.keys():
+		to_add_srv = to_add_dict['srv'][0]
+		add_srv(to_add_srv)
+	
+	return query(request)

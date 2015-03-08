@@ -9,6 +9,9 @@ import random
 from overlay.models import Server, Peer
 from video.models import Video
 
+# ==============================================================
+# Retrieve cache table from local file lists
+# ==============================================================
 def get_local_videos():
 	full_path = os.path.realpath(__file__)
 	cur_folder, cur_file = ntpath.split(full_path)
@@ -26,9 +29,15 @@ def get_local_videos():
 	# print(vidlist)
 	return vidlist
 
+# ==============================================================
+# Get the local host name
+# ==============================================================
 def get_local_name():
 	return str(socket.gethostname())
 
+# ==============================================================
+# Get real videos cached in local host
+# ==============================================================
 def get_real_local_videos():
 	cached_videos = []
 	abspath = os.path.expanduser("~/videos/")
@@ -145,3 +154,20 @@ def get_server(vidID, method):
 
 #cached_videos = get_real_local_videos()
 #print(cached_videos)
+
+# ==============================================================
+# Initialize the cache table for current node
+# ==============================================================
+def init_cache_table():
+	existing_videos = Video.objects.all()
+	if existing_videos.count() > 0:
+		existing_videos.delete()
+	cached_videos = get_local_videos()
+	real_cached_videos = get_real_local_videos()
+	hostname = get_local_name()
+	for vid in cached_videos:
+		vid_id = vid
+		vid_name = random.choice(real_cached_videos)
+		vid_srvs = hostname + ', '
+		cur_vid = Video(id=vid_id, name=vid_name, srvs=vid_srvs)
+		cur_vid.save()

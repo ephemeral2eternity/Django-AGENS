@@ -5,6 +5,10 @@ import subprocess
 import urllib.request
 import urllib.parse
 from overlay.models import Server, Peer
+from video.video_utils import *
+from qoe.qoe_utils import *
+from monitor.cache_monitor import *
+from overlay.ping import *
 
 # ================================================================================
 # Get the dictionary storing info about all cache agents
@@ -60,10 +64,55 @@ def get_cache_agent_ips():
         return agent_ips
 
 # ================================================================================
+# Get an IP addresses of one cache agent
+# @input : the node name to get an IP address
+# @return : IP address of node "node_name"
+# ================================================================================
+def get_node_ip(node_name):
+	all_agent_ips = get_cache_agent_ips()
+	return all_agent_ips[node_name]
+
+# ================================================================================
 # Get the local host name
 # ================================================================================
 def get_host_name():
 	return str(socket.gethostname())
+
+# ================================================================================
+# Initialize the overlay table
+# ================================================================================
+def init_overlay_table():
+	# Initialize the video cache table first
+	init_cache_table()
+	
+	# Initialize the qoe table
+	initializeQoE()
+
+	# Delete all objects in the table
+	existing_srvs = Server.objects.all()
+	if existing_srvs.count() > 0:
+		existing_srvs.delete()
+	cache_srv_ips = get_cache_agent_ips()
+	hostname = get_host_name()
+	print("Obtained cache_srv_ips are", cache_srv_ips)
+	print("Current host name is :", hostname)
+	for srv in cache_srv_ips.keys():
+		srv_id = int(re.findall(r'\d+', srv)[0])
+		srv_name = srv
+		srv_ip = cache_srv_ips[srv]
+		srv_rtt = getMnRTT(srv_ip, 5)
+		srv_qoe = 4.00
+		srv_load = 0
+		srv_bw = 0.00
+		isLocal = (srv == hostname)
+		if isLocal:
+			srv_rtt = 0.0
+			srv_qoe = 5.00
+		cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, qoe=srv_qoe, load=srv_load, bw=srv_bw)
+		cur_srv.save()
+		print(srv_name, " is saved in the database!")
+		if not isLocal:
+			add_cur_node(srv_ip)
 
 # ================================================================================
 # Add the closest available agent as the peer agent
@@ -157,6 +206,120 @@ def peer_with(peer):
 		new_peer = Peer(id=peer_id, name=peer_name, ip=peer_ip)
 		new_peer.save()
 		print("Added new peer", peer_name, "to the agentPeer listi!")
+		return True
+	except:
+		return False
+
+# ================================================================================
+# Delete a node from current Peer List
+# ================================================================================
+def del_peer(peer):
+	to_del_peer_obj = Peer.objects.get(name=peer)
+	if to_del_peer_obj:
+		to_del_peer_obj.delete()
+
+# ================================================================================
+# Delete a server from current overlay table
+# ================================================================================
+def del_srv(srv):
+	to_del_srv_obj = Server.objects.get(name=srv)
+	if to_del_srv_obj:
+		to_del_srv_obj.delete()
+
+# ================================================================================
+# Remove peering relationship with a remote node
+# ================================================================================
+def remove_peer_with(cur_node, peer_ip):
+	url = 'http://%s:8615/overlay/remove?peer=%s'%(peer_ip, cur_node)
+	try:
+		req = urllib.request.Request(url)
+		rsp = urllib.request.urlopen(req)
+		print("Remove", cur_node, "from the remote peer agent's peer list!")
+		return True
+	except:
+		return False
+
+# ================================================================================
+# Remove current node from a remote node's overlay table
+# ================================================================================
+def remove_srv(cur_node, remote_ip):
+	url = 'http://%s:8615/overlay/remove?srv=%s'%(remote_ip, cur_node)
+	try:
+		req = urllib.request.Request(url)
+		rsp = urllib.request.urlopen(req)
+		print("Remove", cur_node, "from the remote peer agent's peer list!")
+		return True
+	except:
+		return False
+
+# ================================================================================
+# Delete current node from all its peers
+# ================================================================================
+def delete_all_peers():
+	# Get all peer nodes.
+	all_peers = Peer.objects.all()
+	cur_node_name = get_host_name()
+	for peer in all_peers:
+		remove_peer_with(cur_node_name, peer.ip)
+		del_peer(peer.name)
+
+# ================================================================================
+# Delete current node from all other servers' overlay table
+# ================================================================================
+def delete_current_node():
+	# Get all other nodes
+	srvs = Server.objects.filter(isLocal=False)
+	cur_node_name = get_host_name()
+	for srv in srvs:
+		remove_srv(cur_node_name, srv.ip)
+
+# ================================================================================
+# Delete current node from all other servers' overlay table and peer list
+# ================================================================================
+def delete_node():
+	# Delete current node from all others' Server List
+	delete_current_node()
+	# Delete current node from all others peer list
+	delete_all_peers()
+	# Dump all monitored traces
+	dump_monitor()
+	# Dump all QoE traces
+	dumpQoE()
+
+# ================================================================================
+# Add remote node to current overlay table
+# @input : node_name ---- the name of remote node
+# ================================================================================
+def add_srv(node_name):
+	hostname = get_host_name()
+	srv_id = int(re.findall(r'\d+', node_name)[0])
+	srv_name = node_name
+	srv_ip = get_node_ip(node_name)
+	srv_rtt = getMnRTT(srv_ip, 5)
+	srv_qoe = 4.00
+	srv_load = 0
+	srv_bw = 0.00
+	isLocal = (node_name == hostname)
+	if isLocal:
+		srv_rtt = 0.0
+		srv_qoe = 5.00
+	cur_srv = Server(id=srv_id, name=srv_name, ip=srv_ip, isLocal=isLocal, rtt=srv_rtt, qoe=srv_qoe, load=srv_load, bw=srv_bw)
+	cur_srv.save()
+	print(srv_name, " is saved in the database!")
+
+# ================================================================================
+# Add current node to other servers' overlay table
+# @input : srv_ip ---- the ip address of the remote agent to add current node on
+# @return : True ---- Successfully add current node on remote agent's overlay table.
+#	    False ---- Failed to add current node on remote agent's overlay table.
+# ================================================================================
+def add_cur_node(srv_ip):
+	cur_node_name = get_host_name()
+	url = 'http://%s:8615/overlay/add?srv=%s'%(srv_ip, cur_node_name)
+	try:
+		req = urllib.request.Request(url)
+		rsp = urllib.request.urlopen(req)
+		print("Add", cur_node, "to the remote server agent's overlay table!")
 		return True
 	except:
 		return False
