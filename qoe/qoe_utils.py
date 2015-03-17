@@ -53,9 +53,15 @@ def getQoEStr():
 #          alpha ---- the weight to be given to the new QoE value
 # ================================================================================
 def updateQoE(srv, qoe, alpha):
-	last_qoe = QoE.objects.filter(srv=srv).order_by('-time')[0]
-	print('Last qoe value for server ', srv, ' is ', last_qoe.qoe)
-	previous_qoe = float(last_qoe.qoe)
+	## Revision by chenw-2015-0317, read QoE updated to overlay not the previous sample.
+	# last_qoe = QoE.objects.filter(srv=srv).order_by('-time')[0]
+	# print('Last qoe value for server ', srv, ' is ', last_qoe.qoe)
+	# previous_qoe = float(last_qoe.qoe)
+	
+	## Read QoE updated to the overlay last time
+	srv_id = int(re.findall(r'\d+', srv)[0])
+	srv_obj = Server.objects.get(pk=srv_id)
+	previous_qoe = srv_obj.qoe
 	new_qoe = (1 - alpha) * previous_qoe + alpha * qoe
 	print('New qoe is ', new_qoe)
 	new_qoe_obj = QoE(qoe=new_qoe, srv=srv)
