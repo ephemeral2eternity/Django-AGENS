@@ -61,7 +61,7 @@ def updateQoE(srv, qoe, alpha):
 	## Read QoE updated to the overlay last time
 	srv_id = int(re.findall(r'\d+', srv)[0])
 	srv_obj = Server.objects.get(pk=srv_id)
-	previous_qoe = srv_obj.qoe
+	previous_qoe = float(srv_obj.qoe)
 	new_qoe = (1 - alpha) * previous_qoe + alpha * qoe
 	print('New qoe is ', new_qoe)
 	new_qoe_obj = QoE(qoe=new_qoe, srv=srv)
