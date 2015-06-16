@@ -9,4 +9,4 @@ class PClient(models.Model):
 class VClient(models.Model):
 	name = models.CharField(max_length=20)
 	ip = models.CharField(max_length=20)
-	last_visit = models.DateTimeField(auto_now=True)
+	last_visit = models.DateTimeField()

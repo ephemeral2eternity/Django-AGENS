@@ -1,5 +1,7 @@
 import re
 import apache_log_parser
+import datetime
+from django.utils.timezone import utc
 from pprint import *
 from client.models import VClient
 
@@ -16,7 +18,7 @@ def get_vclients():
 			cur_ip = log_line_data['remote_host']
 			cur_name = cur_ip
 			cur_request = log_line_data['request_url']
-			cur_time = log_line_data['time_received_datetimeobj']
+			cur_time = log_line_data['time_received_datetimeobj'].replace(tzinfo=utc)
 			if "m4f" in cur_request:
 				# print(cur_ip + ", " + cur_request + ", " + str(cur_time))
 				num_results = VClient.objects.filter(ip=cur_ip).count()
