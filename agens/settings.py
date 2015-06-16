@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'overlay',
     'video',
     'qoe',
+    'client',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -99,5 +100,6 @@ CRON_CLASSES = [
 	"overlay.cron.hop_job",
 	"video.cron.video_update_job",
 	"qoe.cron.qoe_dump_job",
+	"client.cron.get_vclients_job",
 	# ...
 ]

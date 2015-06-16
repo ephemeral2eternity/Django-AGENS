@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^overlay/', include('overlay.urls')),
     url(r'^video/', include('video.urls')),
     url(r'^qoe/', include('qoe.urls')),
+    url(r'^client/', include('client.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
 )
