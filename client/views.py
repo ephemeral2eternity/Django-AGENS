@@ -24,6 +24,23 @@ def query(request):
 	})
 	return HttpResponse(templates.render(context))
 
+def add(request):
+	client_ip = request.META['REMOTE_ADDR']
+	url = request.get_full_path()
+	if '?' in url:
+		client_name = url.split('?')[1]
+	else:
+		client_name = request.META['REMOTE_HOST']
+	num_results = PClient.objects.filter(ip=client_ip).count()
+	if num_results > 0:
+		cur_pclient = PClient.objects.filter(ip=client_ip)[0]
+		cur_pclient.name = client_name
+		cur_pclient.ip = client_ip
+	else:
+		cur_pclient = PClient(name=client_name, ip=client_ip)
+	cur_pclient.save()
+	return pclient(request)
+
 def pclient(request):
 	pclients = PClient.objects.order_by('-last_visit')[:2]
 	pclient_ips = {}
