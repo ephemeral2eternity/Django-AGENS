@@ -5,7 +5,7 @@ import django_cron
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'agens.views.home', name='home'),
+    url(r'^$', include('home.urls'), name='home'),
     url(r'^monitor/', include('monitor.urls')),
     url(r'^overlay/', include('overlay.urls')),
     url(r'^video/', include('video.urls')),

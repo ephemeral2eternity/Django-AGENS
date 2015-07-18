@@ -1,0 +1,23 @@
+<h1>Distributed Cache Agent Deployed in Each Video Server</h1>
+<p>This is a cache agent deployed in video servers that are responsible to 1) connect to other cache agents in an overlay network; 2) monitor RTT, bw, server load on video servers; 3) discover multiple candidate servers caching a certain video (Multi-Candidate Content Delivery); 4) monitor and update Server QoE Score (SQS) on all candidate servers; 5) record latest clients visiting this cache agent or this video server.</p>
+<h2>Overlay Module</h2>
+<p>The overlay module provides the interface to 1) initialize overlay table by communicating with all other cache agents on port 8615; 2) accept other cache agents' update message on informing the current agent about others' load, bw, rtt, and Server QoE Score (SQS) to this cache agent; 3) accept others' peering request, connect peer, and add peers in their peer list; 4) accept the delete request from a peer to delete it from current agent's peer list; 5) delete current node from all other peers' peer list; 6) accept node add request to add a node on current agent's overlay table.</p>
+<ul>
+	<li><a href="/overlay/">Brief description of overlay module!</a></li>
+	<li>Accepting Removing Request to remove a peer from current peer list or to remove a node from current overlay table: /overlay/remove?srv=srvname, /overlay/remove?peer=peerName</li>
+	<li><a href="/overlay/init/">Initialize overlay table with all available cache agents and connect to the overlay by connecting to the closest cache agent.</a></li>
+	<li><a href="/overlay/query/">Show all the nodes' info in the overlay and their load, bw, qoe, and rtts to the current node!</a></li>
+	<li>Accept Updating Request from peers to update other peers' load, bw, SQS, and rtts to current agent: /overlay/update?srv=srv_name&amp;bw=bw_value&amp;load=load_value&amp;qoe=SQS</li>
+	<li>Accept Peering Request: /overlay/peer/ (POST method) that posts the peer's name and id that sends the request, so the current agent can add it into its peer list.</li>
+	<li><a href="/overlay/delete/">Delete current agent from all peers' peer list and server list.</a></li>
+	<li>Accept Peer's Adding Request to add other peer as a server node in current agent's overlay table: /over/add?srv=srv_name</li>
+</ul>
+<h2>Monitoring Module</h2>
+<p>The monitoring module of a cache agent includes periodic probing of server load and server outbound/inbound bandwidth.</p>
+<ul>
+	<li><a href="/monitor/">Show all monitored information for current server</a></li>
+	<li><a href="/monitor/load/">Show recent load on current server</a></li>
+	<li><a href="/monitor/bw/">Show recent outbound/inbound traffic on current server</a></li>
+	<li><a href="/monitor/rtts/">Show the RTTs from current server to all other servers</a></li>
+	<li><a href="/monitor/dump/">Dump data from database to /tmp/cacheagent_ts_datatype.js</a></li>
+</ul>
