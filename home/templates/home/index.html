@@ -21,3 +21,28 @@
 	<li><a href="/monitor/rtts/">Show the RTTs from current server to all other servers</a></li>
 	<li><a href="/monitor/dump/">Dump data from database to /tmp/cacheagent_ts_datatype.js</a></li>
 </ul>
+<h2>Content Discovery Module</h2>
+<p>This module is responsible to 1) initialize the cache table on each server; 2) discover candidate servers for all content; 3) show the cache table; 4) receiving ADD request from other cache agents and add other servers as candidate servers in its own cache table; 5) periodically send out local cached video list to other cache agents; 6) get a selected server for a client request according to the method denoted: qoe, load, rtt, hop, random.</p>
+<ul>
+	<li><a href="/video/">Show the current cache agent's cache table</a></li>
+	<li><a href="/video/init/">Initialize current agent's cache table from locally cache videos defined by configuration files in vidList folder</a></li>
+	<li>Accepting ADD request from other cache agents, /video/add/ (POST method) posts video lists to be added on the current cache agent.</li>
+	<li><a href="/video/discover/">Periodically send out locally cache video list</a></li>
+	<li>Getting a server for a video request: /video/getSrv?method=qoe, rtt, load, hop, random</li>
+</ul>
+<h2>Server QoE Score (SQS) Module</h2>
+<p>This module is responsible to show the server QoE monitored by clients connecting to this cache agent. It includes APIS for 1) initialize the SQS for all servers; 2) Show the latest SQS for all available servers observed from current cache agent; 3) accept QoE UPDATE message from clients; 4) dump SQS scores in the history to Google Cloud Storage</p>
+<ul>
+	<li><a href="/qoe/">Show the latest SQS table for all cache agents</a></li>
+	<li><a href="/qoe/init/">Initialize SQS table as default setting (5 for current server and 4 for all others)</a></li>
+	<li>Receiving QoE UPDATE message from client, /qoe/update?srv=srv_name&amp;qoe=qoe_value&amp;alpha=alpha_value</li>
+	<li><a href="/qoe/dump/">Dump existing SQS table to Google Cloud Storage</a></li>
+</ul>
+<h2>Client Request Monitoring Module</h2>
+<p>Show the latest clients' addresses that have visited the cache agent or the current cache server recently. This module can return three types of clients: 1) the latest 20 clients connecting to the current cache agent; 2) the latest 20 clients streaming videos from the current server; 3) the latest 5 clients downloading the same video from current server.</p>
+<ul>
+	<li><a href="/client/">Show the latest clients visiting current cache agent and current video server</a></li>
+	<li><a href="/client/pclient/">Show the latest clients closeby, that have visited current cache agent</a></li>
+	<li><a href="/client/vclient/">Show the latest clients streaming videos from the current server</a></li>
+	<li>Accepting ADD Request from a client closeby, adding the client as recent clients connecting the current cache agent (redirector). /client/add?client_name: client ip retrieved from the "REMOTE_HOST" field in the request.</li>
+</ul>
