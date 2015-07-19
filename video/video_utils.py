@@ -45,6 +45,8 @@ def get_real_local_videos():
 	# print "Locally cached videos are: ", dirs
 	for video in dirs:
 		cached_videos.append(ntpath.basename(video))
+
+	cached_videos.sort(key=str.lower)
 	return cached_videos
 
 # ================================================================================
@@ -167,7 +169,8 @@ def init_cache_table():
 	hostname = get_local_name()
 	for vid in cached_videos:
 		vid_id = vid
-		vid_name = random.choice(real_cached_videos)
+		vid_name = real_cached_videos[vid_id%3]
+		# vid_name = random.choice(real_cached_videos)
 		vid_srvs = hostname + ', '
 		cur_vid = Video(id=vid_id, name=vid_name, srvs=vid_srvs)
 		cur_vid.save()
