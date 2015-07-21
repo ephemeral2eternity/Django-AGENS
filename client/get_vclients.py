@@ -1,6 +1,7 @@
 import re
 import apache_log_parser
 import datetime
+import socket
 from django.utils.timezone import utc
 from pprint import *
 from client.models import VClient
@@ -16,7 +17,15 @@ def get_vclients():
 			log_line_data = line_parser(line)
 			## pprint(log_line_data)
 			cur_ip = log_line_data['remote_host']
-			cur_name = cur_ip
+
+			## Get name for the client
+			cur_name_obj = socket.gethostbyaddr(cur_ip)
+			if len(cur_name_obj) > 0:
+				cur_name = cur_name_obj[0]
+			else:
+				cur_name = cur_ip
+
+			## Get recent client to database
 			cur_request = log_line_data['request_url']
 			cur_time = log_line_data['time_received_datetimeobj'].replace(tzinfo=utc)
 			if "m4f" in cur_request:
