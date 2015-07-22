@@ -42,7 +42,7 @@ def add(request):
 	return pclient(request)
 
 def pclient(request):
-	pclients = PClient.objects.order_by('-last_visit')[:2]
+	pclients = PClient.objects.order_by('-last_visit')[:20]
 	pclient_ips = {}
 	for pc in pclients:
 		pclient_ips[pc.name] = pc.ip
@@ -53,7 +53,7 @@ def pclient(request):
 
 # Create your views here.
 def vclient(request):
-	vclients = VClient.objects.order_by('-last_visit')[:2]
+	vclients = VClient.objects.order_by('-last_visit')[:20]
 	vclient_ips = {}
 	for vc in vclients:
 		vclient_ips[vc.name] = vc.ip
