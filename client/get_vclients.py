@@ -9,7 +9,7 @@ from client.models import VClient
 def get_vclients():
 	fileName = '/var/log/apache2/access.log'
 	line_parser = apache_log_parser.make_parser("%h %l %u %t \"%r\" %>s %O")
-	line_count = 100
+	line_count = 500
 	curLn = 0
 	for line in reversed(open(fileName).readlines()):
 		if curLn <= line_count:
