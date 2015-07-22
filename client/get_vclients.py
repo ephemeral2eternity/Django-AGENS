@@ -36,6 +36,7 @@ def get_vclients():
 					if cur_obj.last_visit < cur_time:
 						cur_obj.last_visit = cur_time
 						cur_obj.name = cur_name
+						print("[UPDATE]:" + cur_ip + ", " + cur_request + ", " + str(cur_time))
 				else:
 					cur_obj = VClient(name=cur_name, ip=cur_ip, last_visit=cur_time)
 				cur_obj.save()
