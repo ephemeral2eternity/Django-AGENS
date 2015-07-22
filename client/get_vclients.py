@@ -33,8 +33,9 @@ def get_vclients():
 				num_results = VClient.objects.filter(ip=cur_ip).count()
 				if num_results > 0:
 					cur_obj = VClient.objects.filter(ip=cur_ip)[0]
-					cur_obj.last_visit = cur_time
-					cur_obj.name = cur_name
+					if cur_obj.last_visit < cur_time:
+						cur_obj.last_visit = cur_time
+						cur_obj.name = cur_name
 				else:
 					cur_obj = VClient(name=cur_name, ip=cur_ip, last_visit=cur_time)
 				cur_obj.save()
