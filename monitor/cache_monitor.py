@@ -220,6 +220,30 @@ def get_mem():
 	return mem_util
 
 # ================================================================================
+# Read the number of transfers per second from iostat every period
+# ================================================================================
+def get_io_tps():
+	get_io_tps_cmd = "iostat -d |grep 'sda' |awk '{print $2}'"
+	io_tps = float(subprocess.Popen(get_io_tps_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	return io_tps
+
+# ================================================================================
+# Read the number of blocks read per second from iostat every period
+# ================================================================================
+def get_io_readblks():
+	get_io_readblks_cmd = "iostat -d |grep 'sda' |awk '{print $3}'"
+	io_readblks = float(subprocess.Popen(get_io_readblks_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	return io_readblks
+
+# ================================================================================
+# Read the number of blocks write per second from iostat every period
+# ================================================================================
+def get_io_writeblks():
+	get_io_writeblks_cmd = "iostat -d |grep 'sda' |awk '{print $4}'"
+	io_writeblks = float(subprocess.Popen(get_io_writeblks_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	return io_writeblks
+
+# ================================================================================
 # Read outbound bytes every 1 minute. 
 # ================================================================================
 def get_tx_bytes():
