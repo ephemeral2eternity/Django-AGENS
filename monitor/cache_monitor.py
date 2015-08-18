@@ -10,6 +10,7 @@ import shutil
 import socket
 import ntpath
 import codecs
+import subprocess
 import urllib.request, urllib.parse
 from monitor.models import Load, BW, RTTS
 from monitor.gcs_upload import *
@@ -198,6 +199,25 @@ def get_load():
 		ln_num = len(f.readlines())
 	return ln_num
 
+# ================================================================================
+# Read cpu utilization every period
+# ================================================================================
+def get_cpu():
+	get_cpu_cmd = "top -b -n 1  | grep -E 'Cpu' | awk -F ',' '{print $4}' | awk '{print $1}' | awk -F '%' '{print $1}'"
+	cpu_idle = float(subprocess.Popen(get_cpu_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	cpu_util = 1 - cpu_idle
+	return cpu_util
+
+# ================================================================================
+# Read memory utilization every period
+# ================================================================================
+def get_mem():
+	get_used_mem_cmd = "top -b -n 1 | grep -E 'Mem:' | cut -d "," -f 2 | awk '{print $1}'"
+	get_total_mem_cmd = "top -b -n 1 | grep -E 'Mem:' | cut -d "," -f 1 | cut -d ":" -f 2 | awk '{print $1}'"
+	total_mem = float(subprocess.Popen(get_total_mem_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	used_mem = float(subprocess.Popen(get_used_mem_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	mem_util = total_mem/used_mem
+	return mem_util
 
 # ================================================================================
 # Read outbound bytes every 1 minute. 
@@ -208,6 +228,16 @@ def get_tx_bytes():
 	tx_bytes = int(lines[0])
 	file_txbytes.close()
 	return tx_bytes
+
+# ================================================================================
+# Read inbound bytes every 1 minute. 
+# ================================================================================
+def get_rx_bytes():
+	file_rxbytes = open('/sys/class/net/eth0/statistics/rx_bytes')
+	lines = file_rxbytes.readlines()
+	rx_bytes = int(lines[0])
+	file_rxbytes.close()
+	return rx_bytes
 
 # ================================================================================
 # Get current host name 
