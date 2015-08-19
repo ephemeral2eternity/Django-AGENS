@@ -64,8 +64,8 @@ def sys_monitor():
 		previous_stat = SYS_STAT.objects.all()[sys_stat_list_len - 1]
 		previous_ts = time.mktime(previous_stat.time.timetuple())
 		seconds_elapsed = time.time() - previous_ts
-		inbound_traffic = float(previous_stat.total_rx_bytes - rx_bytes) * 8 / float(seconds_elapsed)
-		outbound_traffic = float(previous_stat.total_tx_bytes - tx_bytes) * 8 / float(seconds_elapsed)
+		inbound_traffic = float(rx_bytes - previous_stat.total_rx_bytes) * 8 / float(seconds_elapsed * 1000.0)
+		outbound_traffic = float(tx_bytes - previous_stat.total_tx_bytes) * 8 / float(seconds_elapsed * 1000.0)
 	cur_sys_stat = SYS_STAT(cpu_util=cpu_util, mem_util=mem_util, io_tps=io_tps, io_readblks=io_readblks, io_writeblks=io_writeblks, \
 				inbound_traffic=inbound_traffic, outbound_traffic=outbound_traffic, total_io_read=total_io_read, \
 				total_io_write=total_io_write, total_tx_bytes=tx_bytes, total_rx_bytes=rx_bytes)
