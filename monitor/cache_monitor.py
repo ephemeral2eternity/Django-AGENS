@@ -12,7 +12,7 @@ import ntpath
 import codecs
 import subprocess
 import urllib.request, urllib.parse
-from monitor.models import Load, BW, RTTS
+from monitor.models import Load, BW, RTTS, SYS_STAT
 from monitor.gcs_upload import *
 from overlay.models import Server
 
@@ -38,6 +38,39 @@ def load_monitor():
 	cur_load.save()
 	update_overlay_load(load_diff)
 	print("[Django_crontab] Finished updating new load to all other servers!")
+
+# ================================================================================
+# Monitor video server's system stats in last period. 
+# System statistics include cpu_util, mem_util, io_tps, io_readblks, io_writeblks
+# inbound_traffic, outbound_traffic, total_io_read, total_io_write, total_tx_bytes
+# total_rx_bytes
+# ================================================================================
+def sys_monitor():
+	sys_stat_list = SYS_STAT.objects.all()
+	sys_stat_list_len = sys_stat_list.count()
+	cpu_util = get_cpu()
+	mem_util = get_mem()
+	io_tps = get_io_tps()
+	io_readblks = get_io_readblks()
+	io_writeblks = get_io_writeblks()
+	total_io_read = get_io_read_bytes()
+	total_io_write = get_io_write_bytes()
+	tx_bytes = get_tx_bytes()
+	rx_bytes = get_rx_bytes()
+	if sys_stat_list_len <= 0:
+		inbound_traffic = 0.0
+		outbound_traffic = 0.0
+	else:
+		previous_stat = SYS_STAT.objects.all()[sys_stat_list_len - 1]
+		previous_ts = time.mktime(previous_stat.time.timetuple())
+		seconds_elapsed = time.time() - previous_ts
+		inbound_traffic = float(previous_stat.total_rx_bytes - rx_bytes) * 8 / float(seconds_elapsed)
+		outbound_traffic = float(previous_stat.total_tx_bytes - tx_bytes) * 8 / float(seconds_elapsed)
+	cur_sys_stat = SYS_STAT(cpu_util=cpu_util, mem_util=mem_util, io_tps=io_tps, io_readblks=io_readblks, io_writeblks=io_writeblks, \
+				inbound_traffic=inbound_traffic, outbound_traffic=outbound_traffic, total_io_read=total_io_read, \
+				total_io_write=total_io_write, total_tx_bytes=tx_bytes, total_rx_bytes=rx_bytes)
+	cur_sys_stat.save()
+	print("[Django_crontab] Finished updating new sys_stat in the database!")
 
 # ================================================================================
 # Save the updated load in the overlay table 
@@ -76,8 +109,10 @@ def bw_monitor():
 	else:
 		print("[Django_crontab] Add bw monitored!")
 		previous_obj = BW.objects.all()[bw_list_len - 1]
+		previous_ts = time.mktime(previous_obj.time.timetuple())
+		seconds_elapsed = time.time() - previous_ts
 		cur_tx = get_tx_bytes()
-		cur_bw = float(cur_tx - previous_obj.tx) * 8 / (5 * 60 * 1024 * 1024)
+		cur_bw = float(cur_tx - previous_obj.tx) * 8 / seconds_elapsed
 		print("[Django_crontab] Most Recent BW monitored:", str(cur_bw))
 	cur_bw_obj = BW(bw=cur_bw, tx=cur_tx)
 	cur_bw_obj.save()
@@ -242,6 +277,22 @@ def get_io_writeblks():
 	get_io_writeblks_cmd = "iostat -d |grep 'sda' |awk '{print $4}'"
 	io_writeblks = float(subprocess.Popen(get_io_writeblks_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
 	return io_writeblks
+
+# ================================================================================
+# Read the total bytes read from iostat every period
+# ================================================================================
+def get_io_read_bytes():
+	get_io_read_bytes_cmd = "iostat -d |grep 'sda' |awk '{print $5}'"
+	io_read_bytes = int(subprocess.Popen(get_io_read_bytes_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	return io_read_bytes
+
+# ================================================================================
+# Read the total bytes written from iostat every period
+# ================================================================================
+def get_io_write_bytes():
+	get_io_write_bytes_cmd = "iostat -d |grep 'sda' |awk '{print $5}'"
+	io_write_bytes = int(subprocess.Popen(get_io_write_bytes_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
+	return io_write_bytes
 
 # ================================================================================
 # Read outbound bytes every 1 minute. 
