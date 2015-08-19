@@ -240,7 +240,7 @@ def get_load():
 def get_cpu():
 	get_cpu_cmd = "top -b -n 1  | grep -E 'Cpu' | awk -F ',' '{print $4}' | awk '{print $1}' | awk -F '%' '{print $1}'"
 	cpu_idle = float(subprocess.Popen(get_cpu_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
-	cpu_util = 1 - cpu_idle
+	cpu_util = 100 - cpu_idle
 	return cpu_util
 
 # ================================================================================
