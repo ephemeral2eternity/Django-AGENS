@@ -18,6 +18,7 @@
 	<li><a href="/monitor/">Show all monitored information for current server</a></li>
 	<li><a href="/monitor/load/">Show recent load on current server</a></li>
 	<li><a href="/monitor/bw/">Show recent outbound/inbound traffic on current server</a></li>
+	<li><a href="/monitor/sys/">Show recent system stats on current server</a></li>
 	<li><a href="/monitor/rtts/">Show the RTTs from current server to all other servers</a></li>
 	<li><a href="/monitor/dump/">Dump data from database to /tmp/cacheagent_ts_datatype.js</a></li>
 </ul>
@@ -33,7 +34,7 @@
 <h2>Server QoE Score (SQS) Module</h2>
 <p>This module is responsible to show the server QoE monitored by clients connecting to this cache agent. It includes APIS for 1) initialize the SQS for all servers; 2) Show the latest SQS for all available servers observed from current cache agent; 3) accept QoE UPDATE message from clients; 4) dump SQS scores in the history to Google Cloud Storage</p>
 <ul>
-	<li><a href="/qoe/">Show the latest SQS table for all cache agents</a></li>
+	<li><a href="/qoe/query/">Show the latest SQS table for all cache agents</a></li>
 	<li><a href="/qoe/init/">Initialize SQS table as default setting (5 for current server and 4 for all others)</a></li>
 	<li>Receiving QoE UPDATE message from client, /qoe/update?srv=srv_name&amp;qoe=qoe_value&amp;alpha=alpha_value</li>
 	<li><a href="/qoe/dump/">Dump existing SQS table to Google Cloud Storage</a></li>
