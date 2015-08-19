@@ -247,8 +247,8 @@ def get_cpu():
 # Read memory utilization every period
 # ================================================================================
 def get_mem():
-	get_used_mem_cmd = "top -b -n 1 | grep -E 'Mem:' | cut -d "," -f 2 | awk '{print $1}'"
-	get_total_mem_cmd = "top -b -n 1 | grep -E 'Mem:' | cut -d "," -f 1 | cut -d ":" -f 2 | awk '{print $1}'"
+	get_used_mem_cmd = "top -b -n 1 | grep -E 'Mem:' | cut -d ',' -f 2 | awk '{print $1}'"
+	get_total_mem_cmd = "top -b -n 1 | grep -E 'Mem:' | cut -d ',' -f 1 | cut -d ':' -f 2 | awk '{print $1}'"
 	total_mem = float(subprocess.Popen(get_total_mem_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
 	used_mem = float(subprocess.Popen(get_used_mem_cmd, shell=True, stdout=subprocess.PIPE).stdout.read())
 	mem_util = total_mem/used_mem

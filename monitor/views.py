@@ -8,7 +8,7 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
 from django.http import HttpResponse
-from monitor.models import Load, BW, RTTS
+from monitor.models import Load, BW, RTTS, SYS_STAT
 from monitor.cache_monitor import *
 
 # Create your views here.
@@ -35,6 +35,18 @@ def view_bw(request):
 	context = RequestContext(request, {
 					'cur_host':local_host,
 					'bw_list':bw_list,
+	})
+	return HttpResponse(template.render(context))
+
+# Show the recent system status monitored
+@csrf_exempt
+def view_sys_stat(request):
+	local_host = get_host_name()
+	sys_stat_list = SYS_STAT.objects.order_by('-pk')[:30]
+	template = loader.get_template('monitor/sys_stats.html')
+	context = RequestContext(request, {
+					'cur_host':local_host,
+					'sys_stat_list':sys_stat_list,
 	})
 	return HttpResponse(template.render(context))
 
