@@ -88,6 +88,12 @@ def dumpQoE():
         cur_path, cur_file_name = ntpath.split(cur_file_path)
         cur_host_name = str(socket.gethostname())
         ts = time.strftime('%m%d%H%M')
+
+        try:
+                os.stat(cur_path + '/tmp/')
+        except:
+                os.mkdir(cur_path + '/tmp/')
+
         qoes_file = cur_path + '/tmp/' + cur_host_name + '_' + ts + '_QoE.json'
 
         with open(qoes_file, 'w') as outfile:
