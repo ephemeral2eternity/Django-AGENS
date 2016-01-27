@@ -207,6 +207,12 @@ def dump_monitor():
         cur_path, cur_file_name = ntpath.split(cur_file_path)
         cur_host_name = str(socket.gethostname())
         ts = time.strftime('%m%d%H%M')
+        
+        try:
+                os.stat(cur_path + '/tmp/')
+        except:
+                os.mkdir(cur_path + '/tmp/')
+
         load_file = cur_path + '/tmp/' + cur_host_name + '_' + ts + '_load.json'
         bw_file = cur_path + '/tmp/' + cur_host_name + '_' + ts + '_bw.json'
         rtts_file = cur_path + '/tmp/' + cur_host_name + '_' + ts + '_rtts.json'

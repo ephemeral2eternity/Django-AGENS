@@ -1,15 +1,16 @@
 import logging
-from datetime import timedelta, datetime
+from datetime import timedelta
 import traceback
 import time
 
-from django_cron.models import CronJobLog
 from django.conf import settings
-from django.utils import timezone
+from django.utils.timezone import now as utc_now, localtime, is_naive
+from django.db.models import Q
 
 
 DEFAULT_LOCK_BACKEND = 'django_cron.backends.lock.cache.CacheLock'
 logger = logging.getLogger('django_cron')
+
 
 def get_class(kls):
     """
@@ -24,6 +25,10 @@ def get_class(kls):
         m = getattr(m, comp)
     return m
 
+
+def get_current_time():
+    now = utc_now()
+    return now if is_naive(now) else localtime(now)
 
 
 class Schedule(object):
@@ -44,7 +49,25 @@ class CronJobBase(object):
     Following functions:
     + do - This is the actual business logic to be run at the given schedule
     """
-    pass
+    def __init__(self):
+        self.prev_success_cron = None
+
+    def set_prev_success_cron(self, prev_success_cron):
+        self.prev_success_cron = prev_success_cron
+
+    def get_prev_success_cron(self):
+        return self.prev_success_cron
+
+    @classmethod
+    def get_time_until_run(cls):
+        from django_cron.models import CronJobLog
+        try:
+            last_job = CronJobLog.objects.filter(
+                code=cls.code).latest('start_time')
+        except CronJobLog.DoesNotExist:
+            return timedelta()
+        return (last_job.start_time +
+                timedelta(minutes=cls.schedule.run_every_mins) - utc_now())
 
 
 class CronJobManager(object):
@@ -59,19 +82,24 @@ class CronJobManager(object):
         super(CronJobManager, self).__init__(*args, **kwargs)
 
         self.cron_job_class = cron_job_class
-        self.silent         = silent
-        self.lock_class     = self.get_lock_class()
+        self.silent = silent
+        self.lock_class = self.get_lock_class()
+        self.previously_ran_successful_cron = None
 
     def should_run_now(self, force=False):
+        from django_cron.models import CronJobLog
         cron_job = self.cron_job
         """
         Returns a boolean determining whether this cron should run now or not!
         """
-        # If we pass --force options, we force cron run
+
         self.user_time = None
+        self.previously_ran_successful_cron = None
+
+        # If we pass --force options, we force cron run
         if force:
             return True
-        if cron_job.schedule.run_every_mins != None:
+        if cron_job.schedule.run_every_mins is not None:
 
             # We check last job - success or not
             last_job = None
@@ -81,18 +109,22 @@ class CronJobManager(object):
                 pass
             if last_job:
                 if not last_job.is_success and cron_job.schedule.retry_after_failure_mins:
-                    if timezone.now() > last_job.start_time + timedelta(minutes=cron_job.schedule.retry_after_failure_mins):
+                    if get_current_time() > last_job.start_time + timedelta(minutes=cron_job.schedule.retry_after_failure_mins):
                         return True
                     else:
                         return False
 
-            previously_ran_successful_cron = None
             try:
-                previously_ran_successful_cron = CronJobLog.objects.filter(code=cron_job.code, is_success=True, ran_at_time__isnull=True).latest('start_time')
+                self.previously_ran_successful_cron = CronJobLog.objects.filter(
+                    code=cron_job.code,
+                    is_success=True,
+                    ran_at_time__isnull=True
+                ).latest('start_time')
             except CronJobLog.DoesNotExist:
                 pass
-            if previously_ran_successful_cron:
-                if timezone.now() > previously_ran_successful_cron.start_time + timedelta(minutes=cron_job.schedule.run_every_mins):
+
+            if self.previously_ran_successful_cron:
+                if get_current_time() > self.previously_ran_successful_cron.start_time + timedelta(minutes=cron_job.schedule.run_every_mins):
                     return True
             else:
                 return True
@@ -100,24 +132,32 @@ class CronJobManager(object):
         if cron_job.schedule.run_at_times:
             for time_data in cron_job.schedule.run_at_times:
                 user_time = time.strptime(time_data, "%H:%M")
-                actual_time = time.strptime("%s:%s" % (datetime.now().hour, datetime.now().minute), "%H:%M")
+                now = get_current_time()
+                actual_time = time.strptime("%s:%s" % (now.hour, now.minute), "%H:%M")
                 if actual_time >= user_time:
-                    qset = CronJobLog.objects.filter(code=cron_job.code, start_time__gt=datetime.today().date(), ran_at_time=time_data)
+                    qset = CronJobLog.objects.filter(
+                        code=cron_job.code,
+                        ran_at_time=time_data,
+                        is_success=True
+                    ).filter(
+                        Q(start_time__gt=now) | Q(end_time__gte=now.replace(hour=0, minute=0, second=0, microsecond=0))
+                    )
                     if not qset:
                         self.user_time = time_data
                         return True
+
         return False
 
     def make_log(self, *messages, **kwargs):
         cron_log = self.cron_log
 
-        cron_job      = getattr(self, 'cron_job', self.cron_job_class)
+        cron_job = getattr(self, 'cron_job', self.cron_job_class)
         cron_log.code = cron_job.code
 
-        cron_log.is_success  = kwargs.get('success', True)
-        cron_log.message     = self.make_log_msg(*messages)
+        cron_log.is_success = kwargs.get('success', True)
+        cron_log.message = self.make_log_msg(*messages)
         cron_log.ran_at_time = getattr(self, 'user_time', None)
-        cron_log.end_time    = timezone.now()
+        cron_log.end_time = get_current_time()
         cron_log.save()
 
     def make_log_msg(self, msg, *other_messages):
@@ -138,9 +178,9 @@ class CronJobManager(object):
             else:
                 return self.make_log_msg(msg)
 
-
     def __enter__(self):
-        self.cron_log = CronJobLog(start_time=timezone.now())
+        from django_cron.models import CronJobLog
+        self.cron_log = CronJobLog(start_time=get_current_time())
 
         return self
 
@@ -157,7 +197,7 @@ class CronJobManager(object):
                 err_msg = "Error saving cronjob log message: %s" % e
                 logger.error(err_msg)
 
-        return True # prevent exception propagation
+        return True  # prevent exception propagation
 
     def run(self, force=False):
         """
@@ -174,6 +214,7 @@ class CronJobManager(object):
                 logger.debug("Running cron: %s code %s", cron_job_class.__name__, self.cron_job.code)
                 self.msg = self.cron_job.do()
                 self.make_log(self.msg, success=True)
+                self.cron_job.set_prev_success_cron(self.previously_ran_successful_cron)
 
     def get_lock_class(self):
         name = getattr(settings, 'DJANGO_CRON_LOCK_BACKEND', DEFAULT_LOCK_BACKEND)
@@ -181,7 +222,6 @@ class CronJobManager(object):
             return get_class(name)
         except Exception as err:
             raise Exception("invalid lock module %s. Can't use it: %s." % (name, err))
-
 
     @property
     def msg(self):
