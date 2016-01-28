@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html class="ng-scope" ng-app="AGENS" xmlns="http://www.w3.org/1999/xhtml" xml:lang="EN" dir="ltr" lang="EN"><head>
+<title>AGENS</title>
+    <title>AGENS</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="imagetoolbar" content="no" />
+    <link rel="stylesheet" href="app/css/agens.css" type="text/css">
+    <!-- http://angularjs.org/ -->
+    <script src="app/lib/angular/angular.min.js"></script>
+    <script src="app/lib/angular/angular-resource.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="app/agens.js"></script>
+    <!-- script>
+    $('form#cpu_stress_form').submit(function() { // catch the form's submit event
+      $.ajax({ // create an AJAX call...
+        data: $(this).serialize(), // get the form data
+        type: $(this).attr('get'), // GET or POST
+        url: $(this).attr('/anomaly/cpu'), // the file to call
+        success: function(response) { // on success..
+		$('div#cpu_stress_start').html(response); // update the DIV
+        }
+      });
+      return false; // cancel original event to prevent form submitting
+    });
+    </script-->
+</head>
+<body class="ng-scope" id="top" ng-controller="FaultController">
+<div class="wrapper col1">
+  <div id="header">
+    <div id="topnav">
+      <ul>
+        <li><a href="/about.html">About Us</a><span>Members</span></li>
+        <li><a href="/faults.html">Inject Faults</a><span>Anomaly Benchmark</span></li>
+        <li><a href="/gallery.html">Video</a><span>Available Videos</span></li>
+        <li><a href="/demo.html">Demo</a><span>A Video Player Demo</span></li>
+        <li><a href="/index.html">Homepage</a><span>Project Description</span></li>
+      </ul>
+    </div>
+    <div class="fl_left">
+      <h1><a href="#">AGENS</a></h1>
+      <p>An Agent-based Management and Control System for Large-Scale VoD Service on Cloud</p>
+    </div>
+    <br class="clear">
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col3">
+  <div id="breadcrumb">
+    <ul>
+      <li class="first">You Are Here</li>
+      <li>&#187;</li>
+      <li><a href="#">Anomaly Benchmark</a></li>
+      <li>&#187;</li>
+    </ul>
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col4">
+  <div id="container">
+      <div> <h1><strong>Performance Degrading Faults on Various Types of Resources </strong></h1> </div>
+      <div> <h2>CPU Stress:</h2>
+      <!-- form id="cpu_stress_form" action="/anomaly/cpu" method="get" -->
+      <form ng-submit="cpustress()">
+        <fieldset>
+          Using "stress" tool to spawn N workers spinning sqrt() for T time period to increase CPU utilization:<br>
+          The Number of Workers:<br>
+          <input type="number" ng-model="cpu_N" min="1" /><br>
+          The duration of anomaly (Seconds):<br>
+          <input type="number" ng-model="cpu_T" min="5" step="5" /><br>
+          <input type="submit" id="cpustress" value="Stress CPU" />
+        </fieldset>
+      </form>
+      {{cpu_stress_resp}}
+      </div>
+      <br>
+      <div> <h2>I/O Stress:</h2>
+      <form ng-submit="iostress()">
+        <fieldset>
+          Using "stress" tool to spawn N workers spinning on sync() for T time period to increase I/O utilization:<br>
+          The Number of Workers:<br>
+          <input type="number" ng-model="io_N" min="1" /><br>
+          The duration of anomaly (Seconds):<br>
+          <input type="number" ng-model="io_T" min="5" step="5" /><br>
+          <input type="submit" id="iostress" value="Stress I/O" />
+        </fieldset>
+      </form>
+      {{io_stress_resp}}
+      </div>
+      <br>
+      <div> <h2>Memory Stress:</h2>
+      <form ng-submit="memstress()">
+        <fieldset>
+          Using "stress" tool to spawn N workers spinning on malloc()/free() for T time period and each worker malloc B MBytes to emulate memory leak:<br>
+          The Number of Workers:<br>
+          <input type="number" ng-model="mem_N" min="1" /><br>
+          The Memory to malloc per worker:<br>
+          <input type="number" ng-model="mem_B" min="64" step="64" /><br>
+          The duration of anomaly (Seconds):<br>
+          <input type="number" ng-model="mem_T" min="5" step="5" /><br>
+          <input type="submit" id="memstress" value="Stress Memory" />
+        </fieldset>
+      </form>
+      {{mem_stress_resp}}
+      </div>
+      <br>
+      <hr>
+      <div> <h1><strong>Network Related Faults: </strong></h1> </div>
+      <div> <h2> Outbound/Inbound Capacity Throttling </h2>
+	Using "wondershaper" tool to throttle the inbound/outbound bandwidth to X Kbps to server overload/network congestion:<br>
+	<form ng-submit="bwstress()">
+		<label>Throttle inbound/outbound traffic:
+			<select name="selected_option" id="selected_option" ng-model="bw_opts.selected_option">
+				<option  ng-repeat="opt in bw_opts.available_options" value="{{opt}}">{{opt.name}}</option>
+			</select>
+		</label><br>
+		Throttle the capacity to X (Kbps):<br>
+		<input type="number" ng-model="bw_X" min="100" step="100" /><br>
+		The duration of anomaly (Seconds):<br>
+          	<input type="number" ng-model="bw_T" min="5" step="5" /><br>
+          	<input type="submit" id="bwstress" value="Throttle Bandwidth" />
+	</form>
+      	{{bw_stress_resp}}
+      </div>
+      <br>
+      <hr>
+      <div> <h1><strong>Crash Faults</strong></h1> </div>
+      <div> <h2>HTTPD serivce stops: </h2>
+		<form ng-submit="httpdstop()">
+        	<fieldset>
+          	    Stops Apache2 HTTPD service for T seconds:<br>
+          	    The duration of anomaly (Seconds):<br>
+          	    <input type="number" ng-model="httpd_T" min="5" step="5" /><br>
+          	    <input type="submit" id="httpdstop" value="HTTPD Stops" />
+        	</fieldset>
+		</form>
+		{{httpd_stop_resp}}
+      </div>
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper col5">
+  <div id="footer">
+    <p class="fl_left"><a href="http://theone.ece.cmu.edu/"><img src="app/img/theone-banner.png" style="height:60px"></a></p>
+    <p class="fl_right"><a href="http://ece.cmu.edu/"><img src="app/img/ece-logo.png" style="height:60px"></a></p>
+    <br class="clear">
+    <p align="center"><a href="http://theone.ece.cmu.edu/agens">Copyright &#169; 2015 AGENS</a></p>
+    <br class="clear">
+  </div>
+</div>
+
+
+</body></html>
